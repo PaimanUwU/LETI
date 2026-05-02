@@ -1,0 +1,70 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# =========================
+# Django
+# =========================
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+
+# Django static files (if collected)
+staticfiles/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+
+# =========================
+# Jupyter Notebooks
+# =========================
+.ipynb_checkpoints/
+
+# Optional: ignore notebooks outputs (advanced)
+# Uncomment if needed
+# *.ipynb
+
+# =========================
+# Data files (VERY IMPORTANT)
+# =========================
+*.csv
+*.xlsx
+*.xls
+
+# If you want to keep a sample dataset:
+!data/sample.csv
+
+# =========================
+# Model files (optional)
+# =========================
+*.pkl
+*.joblib
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# =========================
+# Node (if using React)
+# =========================
+node_modules/
+build/
+dist/
