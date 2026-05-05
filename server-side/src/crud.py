@@ -1,17 +1,52 @@
-﻿from sqlalchemy.orm import Session
+﻿import hashlib
+import hmac
+import os
+
+from sqlalchemy.orm import Session
+
 from .models import User
 from .schemas import UserCreate
-from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-#hash password
+_PBKDF2_ITERATIONS = 100_000
+
+
+# Simple, self-contained password hashing using Python's standard library.
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    salt = os.urandom(16)
+    hashed = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt,
+        _PBKDF2_ITERATIONS,
+    )
+    return f"{salt.hex()}${hashed.hex()}"
 
-#verify password
+#verify password by re-hashing the input and comparing to stored hash
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        salt_hex, expected_hex = hashed_password.split("$", 1)
+        salt = bytes.fromhex(salt_hex)
+        expected = bytes.fromhex(expected_hex)
+    except ValueError:
+        return False
+
+    actual = hashlib.pbkdf2_hmac(
+        "sha256",
+        plain_password.encode("utf-8"),
+        salt,
+        _PBKDF2_ITERATIONS,
+    )
+    return hmac.compare_digest(actual, expected)
+
+#authenticate user by email and password
+def authenticate_user(db: Session, email:str, password:str):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return None 
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
 
 #create a new user
 def create_user(db: Session, user: UserCreate, is_admin: bool = False) -> User:

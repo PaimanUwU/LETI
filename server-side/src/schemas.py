@@ -1,8 +1,13 @@
-﻿from pydantic import BaseModel, EmailStr
+﻿from pydantic import BaseModel, EmailStr, constr
 from datetime import datetime
 
 # Request schema - what client sends
 class UserCreate(BaseModel):
+    email: EmailStr
+    # enforce a minimum length; byte-length (72 bytes limit of bcrypt) is checked server-side
+    password: constr(min_length=8)
+    
+class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
@@ -15,3 +20,16 @@ class UserResponse(BaseModel):
     
     class Config:
         from_attributes = True
+        
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    
+class ReportCreate(BaseModel):
+    name:str
+    phone_number: str
+    title: str
+    description: str
+    location: str
+    
+#TODO MAKE A REPORT RESPONSE SCHEMA AND ITS ENDPOINTS
