@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import engine, Base, get_db
-from .schemas import UserCreate, UserResponse, UserLogin, Token
+from .schemas import ReportResponse, UserCreate, UserResponse, UserLogin, Token, ReportCreate, ReportResponse
 from . import crud
 
 
@@ -55,20 +55,12 @@ async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already exists")
     return crud.create_user(db, user, is_admin=True)
 
-
-@app.post("/api/user", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def create_new_user_alias(user: UserCreate, db: Session = Depends(get_db)):
-    existing = crud.get_user_by_email(db, user.email)
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already exists")
-    return crud.create_user(db, user, is_admin=True)
-
-
+#get all users (admin only)
 @app.get("/api/users", response_model=list[UserResponse])
 async def read_all_users(db: Session = Depends(get_db)):
     return crud.get_all_users(db)
 
-
+#get user by id
 @app.get("/api/users/{user_id}", response_model=UserResponse)
 async def read_user(user_id: int, db: Session = Depends(get_db)):
     user = crud.get_user_by_id(db, user_id)
@@ -76,7 +68,7 @@ async def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-
+#delete user (admin only)
 @app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = crud.get_user_by_id(db, user_id)
@@ -84,6 +76,15 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     crud.delete_user(db, user_id)
     return None
+
+#report endpoints
+@app.post("/api/reports", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
+async def create_report(report: ReportCreate, db: Session = Depends(get_db)):
+    return crud.create_report(db, report)
+
+@app.get("/api/reports", response_model=list[ReportResponse])
+async def read_reports(db: Session = Depends(get_db)):
+    return crud.get_reports(db)
 
 
 @app.get("/health")
