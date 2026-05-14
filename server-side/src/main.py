@@ -1,9 +1,10 @@
 # main.py
+from datetime import datetime, timedelta
 import os
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-
+from jose import jwt
 from .database import engine, Base, get_db
 from .schemas import ReportResponse, UserCreate, UserResponse, UserLogin, Token, ReportCreate, ReportResponse
 from . import crud
@@ -13,8 +14,8 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="LETI API", version="1.0.0")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production-12345")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
@@ -34,7 +35,7 @@ def create_access_token(data: dict, expires_minutes: int = ACCESS_TOKEN_EXPIRE_M
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 #login user and return JWT token
-@app.post("/apiauth/login", response_model=Token)
+@app.post("/api/auth/login", response_model=Token)
 async def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = crud.authenticate_user(db, user.email, user.password)
     if not db_user:

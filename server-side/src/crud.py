@@ -5,7 +5,7 @@ import os
 from sqlalchemy.orm import Session
 
 from .models import Report, User
-from .schemas import UserCreate
+from .schemas import UserCreate, ReportCreate
 
 
 _PBKDF2_ITERATIONS = 100_000
@@ -88,12 +88,13 @@ def delete_user(db: Session, user_id: int):
     
     
 #Crud operations for reports
-def create_report(db: Session, report):
-    db_report = report(
+def create_report(db: Session, report: ReportCreate):
+    db_report = Report(
         name=report.name,
         phone_number=report.phone_number,
         title=report.title,
-        description=report.description
+        description=report.description,
+        location=report.location
     )
     db.add(db_report)
     db.commit()
