@@ -4,13 +4,15 @@ import os
 
 from sqlalchemy.orm import Session
 
-from .models import User
-from .schemas import UserCreate
+from .models import Report, User
+from .schemas import UserCreate, ReportCreate
 
 
 _PBKDF2_ITERATIONS = 100_000
 
 
+
+# CRUD operations for users - create, read, update, delete, and authentication
 # Simple, self-contained password hashing using Python's standard library.
 def hash_password(password: str) -> str:
     salt = os.urandom(16)
@@ -85,3 +87,19 @@ def delete_user(db: Session, user_id: int):
     db.commit()
     
     
+#Crud operations for reports
+def create_report(db: Session, report: ReportCreate):
+    db_report = Report(
+        name=report.name,
+        phone_number=report.phone_number,
+        title=report.title,
+        description=report.description,
+        location=report.location
+    )
+    db.add(db_report)
+    db.commit()
+    db.refresh(db_report)
+    return db_report
+
+def get_reports(db: Session):
+    return db.query(Report).all()
