@@ -24,13 +24,14 @@ export default function Login() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.detail || "Invalid credentials")
+        const errorMsg = typeof data.detail === "string" 
+          ? data.detail 
+          : data.detail?.[0]?.msg || "Invalid credentials"
+        throw new Error(errorMsg)
       }
 
-      // Store the token
       localStorage.setItem("token", data.access_token)
 
-      // Redirect to home or dashboard
       navigate("/")
     } catch (err: any) {
       setError(err.message)
