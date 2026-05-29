@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 import os
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from jose import jwt
+from jose import jwt, JWTError
 from .database import engine, Base, get_db
 from .schemas import ReportResponse, UserCreate, UserResponse, UserLogin, Token, ReportCreate, ReportResponse
 from . import crud
@@ -33,6 +34,35 @@ def create_access_token(data: dict, expires_minutes: int = ACCESS_TOKEN_EXPIRE_M
     expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
     payload.update({"exp": expire})
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+# OAuth2 scheme for dependency injection. tokenUrl should point to the login endpoint
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Dependency to retrieve the current user from a bearer JWT token.
+
+    Raises 401 if token is invalid/expired or user does not exist.
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        sub = payload.get("sub")
+        if sub is None:
+            raise credentials_exception
+        user_id = int(sub)
+    except JWTError:
+        raise credentials_exception
+
+    user = crud.get_user_by_id(db, user_id)
+    if not user:
+        raise credentials_exception
+    return user
 
 #login user and return JWT token
 @app.post("/api/auth/login", response_model=Token)
@@ -80,11 +110,17 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 #report endpoints
 @app.post("/api/reports", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
-async def create_report(report: ReportCreate, db: Session = Depends(get_db)):
+async def create_report(
+    report: ReportCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    # current_user is required (token validated). You can add further authorization checks here.
     return crud.create_report(db, report)
 
 @app.get("/api/reports", response_model=list[ReportResponse])
-async def read_reports(db: Session = Depends(get_db)):
+async def read_reports(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    # Require authentication to read reports
     return crud.get_reports(db)
 
 
