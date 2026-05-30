@@ -35,7 +35,7 @@ export function MainLayout() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link to="/submit">Report Crime</Link>
+                  <Link to="/submitreport">Report Crime</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>

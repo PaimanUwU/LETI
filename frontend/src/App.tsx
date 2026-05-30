@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
-import Submit from './pages/Submit'
+import Submit from './pages/SubmitReport'
 import { MainLayout } from './layouts/MainLayout'
 import './style.css'
 
@@ -14,7 +14,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/submit" element={<Submit />} />
+          <Route path="/submitreport" element={<Submit />} />
         </Route>
       </Routes>
     </Router>
