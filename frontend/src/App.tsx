@@ -1,8 +1,11 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Submit from './pages/Submit'
 import { MainLayout } from './layouts/MainLayout'
+import './style.css'
 
 function App() {
   return (
@@ -17,5 +20,11 @@ function App() {
     </Router>
   )
 }
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
 
 export default App
