@@ -1,6 +1,5 @@
 # main.py
 import os
-import jwt
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
