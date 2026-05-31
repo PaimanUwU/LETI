@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -13,6 +14,19 @@ import { MainLayout } from "./layouts/MainLayout";
 import "./style.css";
 
 // todo:
+=======
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Submit from './pages/SubmitReport'
+import InfoAI from './pages/Info/AI'
+import InfoData from './pages/Info/Data'
+import InfoDocs from './pages/Info/Docs'
+import { MainLayout } from './layouts/MainLayout'
+import './style.css'
+>>>>>>> d53caf0 (feat(Pages): Add new info pages (AI, data and project))
 
 function App() {
   return (
@@ -25,6 +39,7 @@ function App() {
           <Route path="/info" element={<InfoDocs />} />
           <Route path="/info/AI" element={<InfoAI />} />
           <Route path="/info/Data" element={<InfoData />} />
+<<<<<<< HEAD
         </Route>
 
         {/* Admin Routes */}
@@ -36,6 +51,8 @@ function App() {
           {/* Placeholder for now */}
           <Route path="ai" element={<Dashboard />} />{" "}
           {/* Placeholder for now */}
+=======
+>>>>>>> d53caf0 (feat(Pages): Add new info pages (AI, data and project))
         </Route>
       </Routes>
     </Router>
