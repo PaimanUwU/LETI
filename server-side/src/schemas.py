@@ -43,3 +43,15 @@ class ReportResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class CrimePredictionInput(BaseModel):
+    district: str
+    category: str
+    type: str
+    year: int
+    month: int
+
+
+class StateHeatmapResponse(BaseModel):
+    state: str
+    predicted_crimes: float
