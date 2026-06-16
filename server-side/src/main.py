@@ -9,6 +9,7 @@ from .database import engine, Base, get_db
 
 from .ai_utils import (
     dashboard_summary,
+    dashboard_stats,
     top_districts,
     crime_counts_by_category,
     monthly_trends,
@@ -97,6 +98,10 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     return None
 
 # AI dashboard endpoints
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats():
+    return dashboard_stats()
+
 @app.get("/api/dashboard/summary")
 async def get_dashboard_summary(limit: int = 10):
     return dashboard_summary(limit)
@@ -139,25 +144,6 @@ def crime_heatmap(
         year=year,
         month=month
     )
-    
-@app.get("/api/debug/heatmap-check")
-def debug_heatmap():
-    from .ai_utils import load_data, DISTRICT_MAPPING, CATEGORY_MAPPING, TYPE_MAPPING
-
-    df = load_data()
-
-    return {
-        "df_empty": df.empty,
-        "rows": len(df),
-        "columns": list(df.columns),
-        "sample_states": df["state"].dropna().unique()[:10].tolist() if not df.empty else [],
-        "sample_districts": df["district"].dropna().unique()[:10].tolist() if not df.empty else [],
-        "mapping_sizes": {
-            "district": len(DISTRICT_MAPPING),
-            "category": len(CATEGORY_MAPPING),
-            "type": len(TYPE_MAPPING),
-        }
-    }    
 
 @app.get("/api/debug/predict-one")
 def debug_predict():
