@@ -1,9 +1,11 @@
 from pathlib import Path
+from typing import Optional
 import pandas as pd
 import joblib
 import numpy as np
 
 from .schemas import CrimePredictionInput
+from .district_coordinates import DISTRICT_COORDINATES
 
 # =========================================================
 # PATH CONFIG
@@ -196,7 +198,7 @@ def dashboard_stats() -> dict:
         }
 
     # --- Total Cases --------------------------------------------------
-    total_cases = float(df["crimes"].count())
+    total_cases = float(df["crimes"].sum())
 
     # --- Monthly Trend (% change) ------------------------------------
     # Data is yearly (all dates are Jan-01), so we compare latest two years
@@ -283,42 +285,205 @@ def run_ml_prediction(payload: CrimePredictionInput) -> dict:
 # =========================================================
 # HEATMAP GENERATOR
 # =========================================================
-def generate_state_heatmap_predictions(year: int, month: int) -> list[dict]:
+
+def generate_heatmap_data(
+    state: Optional[str] = None,
+    category: Optional[str] = None,
+    type: Optional[str] = None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    limit: int = 0
+) -> dict:
     """
-    @desc     Simulates and aggregates geographic crime volumes to populate map UI.
-              Cleans structural anomalies ("Malaysia", "all") before batch processing.
-    @header   none - note: this endpoint is intended for internal dashboard use and may not require auth.
-    @body     {int} year - Target forecasting year.
-    @body     {int} month - Target forecasting month (1-12).
-    @returns  {list[dict]} Grouped and sorted array of states with forecast totals.
+    @desc     Builds heatmap payloads for geographic crime visualisation.
+              All filter parameters are optional — omit a filter to include
+              all values for that dimension.
+    @header   X-State, X-Category, X-Type, X-Year, X-Month (all optional)
+    @body     {str|None}  state    — optional state filter
+    @body     {str|None}  category — optional category filter
+    @body     {str|None}  type     — optional type filter
+    @body     {int|None}  year     — optional year filter
+    @body     {int|None}  month    — optional month filter
+    @body     {int}       limit    — optional cap on records returned (0 = unlimited)
+    @returns  {dict} Envelope with status, meta, and data array.
     """
     df = load_data()
 
-    if df.empty or MODEL is None:
-        return []
+    if df.empty:
+        return {"status": "error", "message": "No dataset loaded", "meta": {}, "data": []}
 
-    # Clean data payload constraints
+    # ── Step 1: clean aggregate rows ──────────────────────
     df = df[
         (df["state"] != "Malaysia") &
         (df["district"] != "all") &
         (df["type"] != "all")
     ].copy()
 
-    # Generate unique topologies
-    grouped = df.groupby(
-        ["state", "district", "category", "type"]
-    ).size().reset_index()
+    # ── Step 2: standardise string columns ────────────────
+    df["state_clean"]    = df["state"].astype(str).str.lower().str.strip()
+    df["district_clean"] = df["district"].astype(str).str.lower().str.strip()
+    df["category_clean"] = df["category"].astype(str).str.lower().str.strip()
+    df["type_clean"]     = df["type"].astype(str).str.lower().str.strip()
 
-    state_totals = {}
+    # Double-clean — some rows may still contain "malaysia" / "all"
+    df = df[
+        (df["state_clean"] != "malaysia") &
+        (df["district_clean"] != "all") &
+        (df["type_clean"] != "all")
+    ].copy()
+
+    # ── Step 3: parse temporal features ───────────────────
+    df["date"]  = pd.to_datetime(df["date"])
+    df["year"]  = df["date"].dt.year
+    df["month"] = df["date"].dt.month
+
+    # ── Step 4: apply optional filters ────────────────────
+    active_filters: list[str] = []
+
+    if state is not None:
+        s = state.lower().strip()
+        df = df[df["state_clean"] == s]
+        active_filters.append("state")
+
+    if category is not None:
+        c = category.lower().strip()
+        df = df[df["category_clean"] == c]
+        active_filters.append("category")
+
+    if type is not None:
+        t = type.lower().strip()  # e.g. "break_in", "murder"
+        df = df[df["type_clean"] == t]
+        active_filters.append("type")
+
+    if year is not None:
+        df = df[df["year"] == year]
+        active_filters.append("year")
+
+    if month is not None:
+        df = df[df["month"] == month]
+        active_filters.append("month")
+
+    # ── Step 5: aggregate & map coordinates ──────────────
+    if df.empty:
+        return {"status": "success", "meta": {"filters_applied": active_filters, "total_records": 0}, "data": []}
+
+    aggregated = df.groupby("district_clean")["crimes"].sum().reset_index()
+
+    data_payload: list[dict] = []
+    for _, row in aggregated.iterrows():
+        district_name = row["district_clean"]
+        coords = DISTRICT_COORDINATES.get(district_name)
+
+        if coords:
+            data_payload.append({
+                "district":    district_name.title(),
+                "latitude":    coords["lat"],
+                "longitude":   coords["lon"],
+                "crime_count": int(row["crimes"]),
+            })
+
+    # Optional result limiting
+    if limit > 0:
+        data_payload.sort(key=lambda x: x["crime_count"], reverse=True)
+        data_payload = data_payload[:limit]
+
+    return {
+        "status": "success",
+        "meta": {
+            "state":    state.title() if state else "all",
+            "category": category.title() if category else "all",
+            "type":     type.title() if type else "all",
+            "year":     year if year else "all",
+            "month":    month if month else "all",
+            "filters_applied": active_filters,
+            "total_records": len(data_payload),
+        },
+        "data": data_payload,
+    }
+    
+    
+def generate_state_heatmap_predictions(
+    state: Optional[str] = None,
+    category: Optional[str] = None,
+    type: Optional[str] = None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+) -> dict:
+    """
+    @desc     Runs ML predictions for every (district, category, type) combo and
+              aggregates the results by state for map visualisation.
+              All filter parameters are optional — omit a filter to include all
+              values for that dimension.
+    @header   X-State, X-Category, X-Type, X-Year, X-Month (all optional)
+    @body     {str|None}  state    — optional state filter
+    @body     {str|None}  category — optional category filter
+    @body     {str|None}  type     — optional type filter
+    @body     {int|None}  year     — optional prediction year (default: latest in data)
+    @body     {int|None}  month    — optional prediction month (default: 1)
+    @returns  {dict} Envelope with status, meta, and data array.
+    """
+    df = load_data()
+
+    if df.empty:
+        return {"status": "error", "message": "No dataset loaded", "meta": {}, "data": []}
+
+    if MODEL is None:
+        return {"status": "error", "message": "ML model not loaded", "meta": {}, "data": []}
+
+    # ── Step 1: clean aggregate rows ──────────────────────
+    df = df[
+        (df["state"] != "Malaysia") &
+        (df["district"] != "all") &
+        (df["type"] != "all")
+    ].copy()
+
+    # ── Step 2: standardise string columns ────────────────
+    df["state_clean"]    = df["state"].astype(str).str.lower().str.strip()
+    df["district_clean"] = df["district"].astype(str).str.lower().str.strip()
+    df["category_clean"] = df["category"].astype(str).str.lower().str.strip()
+    df["type_clean"]     = df["type"].astype(str).str.lower().str.strip()
+
+    # ── Step 3: apply optional filters before generating combos ──
+    active_filters: list[str] = []
+
+    if state is not None:
+        s = state.lower().strip()
+        df = df[df["state_clean"] == s]
+        active_filters.append("state")
+
+    if category is not None:
+        c = category.lower().strip()
+        df = df[df["category_clean"] == c]
+        active_filters.append("category")
+
+    if type is not None:
+        t = type.lower().strip()
+        df = df[df["type_clean"] == t]
+        active_filters.append("type")
+
+    # ── Step 4: resolve prediction year / month ───────────
+    df["date"] = pd.to_datetime(df["date"])
+    df["data_year"] = df["date"].dt.year
+
+    resolved_year = year if year is not None else int(df["data_year"].max())
+    resolved_month = month if month is not None else 1
+
+    # ── Step 5: generate unique combos from remaining data ─
+    grouped = (
+        df.groupby(["state", "district_clean", "category_clean", "type_clean"])
+        .size()
+        .reset_index()
+    )
+
+    state_totals: dict[str, float] = {}
 
     for row in grouped.itertuples(index=False):
-
         payload = CrimePredictionInput(
-            district=row.district,
-            category=row.category,
-            type=row.type,
-            year=year,
-            month=month
+            district=row.district_clean,
+            category=row.category_clean,
+            type=row.type_clean,
+            year=resolved_year,
+            month=resolved_month,
         )
 
         result = run_ml_prediction(payload)
@@ -326,21 +491,33 @@ def generate_state_heatmap_predictions(year: int, month: int) -> list[dict]:
         if "error" in result:
             continue
 
-        state = row.state
-
-        state_totals[state] = (
-            state_totals.get(state, 0)
-            + result["predicted_crimes"]
+        s = row.state
+        state_totals[s] = (
+            state_totals.get(s, 0) + result["predicted_crimes"]
         )
 
-    return [
+    data_payload = [
         {
-            "state": state,
-            "predicted_crimes": round(value, 2)
+            "state": s,
+            "predicted_crimes": round(value, 2),
         }
-        for state, value in sorted(
+        for s, value in sorted(
             state_totals.items(),
             key=lambda x: x[1],
-            reverse=True
+            reverse=True,
         )
     ]
+
+    return {
+        "status": "success",
+        "meta": {
+            "state":    state.title() if state else "all",
+            "category": category.title() if category else "all",
+            "type":     type.title() if type else "all",
+            "year":     resolved_year,
+            "month":    resolved_month,
+            "filters_applied": active_filters,
+            "total_states": len(data_payload),
+        },
+        "data": data_payload,
+    }

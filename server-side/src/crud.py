@@ -85,21 +85,3 @@ def update_user(db: Session, user_id: int, **kwargs):
 def delete_user(db: Session, user_id: int):
     db.query(User).filter(User.id == user_id).delete()
     db.commit()
-    
-    
-#Crud operations for reports
-def create_report(db: Session, report: ReportCreate):
-    db_report = Report(
-        name=report.name,
-        phone_number=report.phone_number,
-        title=report.title,
-        description=report.description,
-        location=report.location
-    )
-    db.add(db_report)
-    db.commit()
-    db.refresh(db_report)
-    return db_report
-
-def get_reports(db: Session):
-    return db.query(Report).all()
