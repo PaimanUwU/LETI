@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Users, 
   FileText, 
@@ -9,7 +9,8 @@ import {
   TrendingUp, 
   AlertCircle,
   CheckCircle2,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 import { 
   Card, 
@@ -43,53 +44,109 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-
-const stats = [
-  { 
-    title: 'Total Users', 
-    value: '1,284', 
-    description: '+12% from last month', 
-    icon: Users,
-    color: 'text-blue-500',
-    bg: 'bg-blue-100 dark:bg-blue-900/20'
-  },
-  { 
-    title: 'Active Reports', 
-    value: '456', 
-    description: '24 pending review', 
-    icon: FileText,
-    color: 'text-orange-500',
-    bg: 'bg-orange-100 dark:bg-orange-900/20'
-  },
-  { 
-    title: 'AI Predictions', 
-    value: '92%', 
-    description: 'Average confidence rate', 
-    icon: Cpu,
-    color: 'text-purple-500',
-    bg: 'bg-purple-100 dark:bg-purple-900/20'
-  },
-  { 
-    title: 'System Health', 
-    value: 'Optimal', 
-    description: 'All services running', 
-    icon: CheckCircle2,
-    color: 'text-green-500',
-    bg: 'bg-green-100 dark:bg-green-900/20'
-  },
-];
+import { api } from '@/lib/api';
+import type { UserResponse, ReportResponse, DashboardStats } from '@/lib/api';
 
 const Dashboard: React.FC = () => {
+  const [reports, setReports] = useState<ReportResponse[]>([]);
+  const [users, setUsers] = useState<UserResponse[]>([]);
+  const [statsData, setStatsData] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [reportsData, usersData, stats] = await Promise.all([
+          api.reports.getAll(),
+          api.users.getAll(),
+          api.dashboard.getStats()
+        ]);
+        setReports(reportsData);
+        setUsers(usersData);
+        setStatsData(stats);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleDeleteUser = async (id: number) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      try {
+        await api.users.delete(id);
+        setUsers(users.filter(u => u.id !== id));
+      } catch (err: any) {
+        alert(err.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const statCards = [
+    { 
+      title: 'Total Users', 
+      value: users.length.toString(), 
+      description: 'Platform members', 
+      icon: Users,
+      color: 'text-blue-500',
+      bg: 'bg-blue-100 dark:bg-blue-900/20'
+    },
+    { 
+      title: 'Active Reports', 
+      value: reports.length.toString(), 
+      description: 'Community cases', 
+      icon: FileText,
+      color: 'text-orange-500',
+      bg: 'bg-orange-100 dark:bg-orange-900/20'
+    },
+    { 
+      title: 'AI Accuracy', 
+      value: statsData?.accuracy ? `${statsData.accuracy}%` : '92%', 
+      description: 'Model confidence', 
+      icon: Cpu,
+      color: 'text-purple-500',
+      bg: 'bg-purple-100 dark:bg-purple-900/20'
+    },
+    { 
+      title: 'Resolved', 
+      value: statsData?.resolved_cases?.toString() || '0', 
+      description: 'Cases closed', 
+      icon: CheckCircle2,
+      color: 'text-green-500',
+      bg: 'bg-green-100 dark:bg-green-900/20'
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
-        <p className="text-muted-foreground">Manage your platform and monitor AI performance.</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
+          <p className="text-muted-foreground">Manage your platform and monitor AI performance.</p>
+        </div>
+        {error && (
+          <Badge variant="destructive" className="animate-pulse">
+            API Error: {error}
+          </Badge>
+        )}
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
@@ -137,7 +194,7 @@ const Dashboard: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Report ID</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Title</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
@@ -145,45 +202,48 @@ const Dashboard: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { id: 'REP-1024', type: 'Theft', location: 'Downtown', status: 'Pending', date: '2024-05-15' },
-                    { id: 'REP-1023', type: 'Vandalism', location: 'North Side', status: 'Resolved', date: '2024-05-14' },
-                    { id: 'REP-1022', type: 'Assault', location: 'West End', status: 'Investigating', date: '2024-05-14' },
-                    { id: 'REP-1021', type: 'Theft', location: 'Central Square', status: 'Resolved', date: '2024-05-13' },
-                  ].map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell className="font-medium">{report.id}</TableCell>
-                      <TableCell>{report.type}</TableCell>
-                      <TableCell>{report.location}</TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={
-                            report.status === 'Resolved' ? 'secondary' : 
-                            report.status === 'Pending' ? 'outline' : 'default'
-                          }
-                        >
-                          {report.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{report.date}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>View details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit report</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                  {reports.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No reports found.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    reports.map((report) => (
+                      <TableRow key={report.id}>
+                        <TableCell className="font-medium">REP-{report.id}</TableCell>
+                        <TableCell>{report.title}</TableCell>
+                        <TableCell>{report.location}</TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={
+                              report.approval_status === 'resolved' ? 'secondary' : 
+                              report.approval_status === 'pending' ? 'outline' : 'default'
+                            }
+                          >
+                            {report.approval_status || 'pending'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(report.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem>View details</DropdownMenuItem>
+                              <DropdownMenuItem>Edit report</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -201,47 +261,55 @@ const Dashboard: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Role</TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Joined</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { name: 'John Doe', role: 'User', email: 'john@example.com', status: 'Active' },
-                    { name: 'Sarah Smith', role: 'Moderator', email: 'sarah@example.com', status: 'Active' },
-                    { name: 'Admin One', role: 'Admin', email: 'admin@letiproject.com', status: 'Active' },
-                    { name: 'Jane Wilson', role: 'User', email: 'jane@example.com', status: 'Inactive' },
-                  ].map((user) => (
-                    <TableRow key={user.email}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.status === 'Active' ? 'secondary' : 'outline'}>
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit profile</DropdownMenuItem>
-                            <DropdownMenuItem>Reset password</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-500">Suspend User</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        No users found.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.id}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={user.is_admin ? 'default' : 'secondary'}>
+                            {user.is_admin ? 'Admin' : 'User'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem>Edit profile</DropdownMenuItem>
+                              <DropdownMenuItem>Reset password</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-red-500 cursor-pointer"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                Delete User
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Link, useNavigate } from "react-router-dom"
+import { api } from "@/lib/api"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -15,24 +16,8 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/login", {
-
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        const errorMsg = typeof data.detail === "string" 
-          ? data.detail 
-          : data.detail?.[0]?.msg || "Invalid credentials"
-        throw new Error(errorMsg)
-      }
-
+      const data = await api.auth.login({ email, password })
       localStorage.setItem("token", data.access_token)
-
       navigate("/admin/dashboard")
     } catch (err: any) {
       setError(err.message)
