@@ -1,51 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  Users, 
-  FileText, 
-  Cpu, 
-  Plus, 
-  MoreHorizontal, 
-  Search, 
-  TrendingUp, 
+import React, { useEffect, useState } from "react";
+import {
+  Users,
+  FileText,
+  Cpu,
+  Plus,
+  MoreHorizontal,
+  Search,
+  TrendingUp,
   AlertCircle,
   CheckCircle2,
   Clock,
-  Loader2
-} from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { api } from '@/lib/api';
-import type { UserResponse, ReportResponse, DashboardStats } from '@/lib/api';
+  Loader2,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { api } from "@/lib/api";
+import type { UserResponse, ReportResponse, DashboardStats } from "@/lib/api";
 
 const Dashboard: React.FC = () => {
   const [reports, setReports] = useState<ReportResponse[]>([]);
@@ -61,7 +56,7 @@ const Dashboard: React.FC = () => {
         const [reportsData, usersData, stats] = await Promise.all([
           api.reports.getAll(),
           api.users.getAll(),
-          api.dashboard.getStats()
+          api.dashboard.getStats(),
         ]);
         setReports(reportsData);
         setUsers(usersData);
@@ -80,7 +75,7 @@ const Dashboard: React.FC = () => {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         await api.users.delete(id);
-        setUsers(users.filter(u => u.id !== id));
+        setUsers(users.filter((u) => u.id !== id));
       } catch (err: any) {
         alert(err.message);
       }
@@ -96,37 +91,37 @@ const Dashboard: React.FC = () => {
   }
 
   const statCards = [
-    { 
-      title: 'Total Users', 
-      value: users.length.toString(), 
-      description: 'Platform members', 
+    {
+      title: "Total Users",
+      value: users.length.toString(),
+      description: "Platform members",
       icon: Users,
-      color: 'text-blue-500',
-      bg: 'bg-blue-100 dark:bg-blue-900/20'
+      color: "text-blue-500",
+      bg: "bg-blue-100 dark:bg-blue-900/20",
     },
-    { 
-      title: 'Active Reports', 
-      value: reports.length.toString(), 
-      description: 'Community cases', 
+    {
+      title: "Active Reports",
+      value: reports.length.toString(),
+      description: "Community cases",
       icon: FileText,
-      color: 'text-orange-500',
-      bg: 'bg-orange-100 dark:bg-orange-900/20'
+      color: "text-orange-500",
+      bg: "bg-orange-100 dark:bg-orange-900/20",
     },
-    { 
-      title: 'AI Accuracy', 
-      value: statsData?.accuracy ? `${statsData.accuracy}%` : '92%', 
-      description: 'Model confidence', 
+    {
+      title: "AI Accuracy",
+      value: statsData?.accuracy ? `${statsData.accuracy}%` : "92%",
+      description: "Model confidence",
       icon: Cpu,
-      color: 'text-purple-500',
-      bg: 'bg-purple-100 dark:bg-purple-900/20'
+      color: "text-purple-500",
+      bg: "bg-purple-100 dark:bg-purple-900/20",
     },
-    { 
-      title: 'Resolved', 
-      value: statsData?.resolved_cases?.toString() || '0', 
-      description: 'Cases closed', 
+    {
+      title: "Resolved",
+      value: statsData?.resolved_cases?.toString() || "0",
+      description: "Cases closed",
       icon: CheckCircle2,
-      color: 'text-green-500',
-      bg: 'bg-green-100 dark:bg-green-900/20'
+      color: "text-green-500",
+      bg: "bg-green-100 dark:bg-green-900/20",
     },
   ];
 
@@ -134,8 +129,12 @@ const Dashboard: React.FC = () => {
     <div className="space-y-8">
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
-          <p className="text-muted-foreground">Manage your platform and monitor AI performance.</p>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Dashboard Overview
+          </h2>
+          <p className="text-muted-foreground">
+            Manage your platform and monitor AI performance.
+          </p>
         </div>
         {error && (
           <Badge variant="destructive" className="animate-pulse">
@@ -149,14 +148,18 @@ const Dashboard: React.FC = () => {
         {statCards.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
               <div className={`${stat.bg} p-2 rounded-md`}>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.description}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -187,7 +190,9 @@ const Dashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Recent Crime Reports</CardTitle>
-              <CardDescription>View and manage the latest community reports.</CardDescription>
+              <CardDescription>
+                View and manage the latest community reports.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -204,27 +209,37 @@ const Dashboard: React.FC = () => {
                 <TableBody>
                   {reports.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         No reports found.
                       </TableCell>
                     </TableRow>
                   ) : (
                     reports.map((report) => (
                       <TableRow key={report.id}>
-                        <TableCell className="font-medium">REP-{report.id}</TableCell>
+                        <TableCell className="font-medium">
+                          REP-{report.id}
+                        </TableCell>
                         <TableCell>{report.title}</TableCell>
                         <TableCell>{report.location}</TableCell>
                         <TableCell>
-                          <Badge 
+                          <Badge
                             variant={
-                              report.approval_status === 'resolved' ? 'secondary' : 
-                              report.approval_status === 'pending' ? 'outline' : 'default'
+                              report.approval_status === "resolved"
+                                ? "secondary"
+                                : report.approval_status === "pending"
+                                  ? "outline"
+                                  : "default"
                             }
                           >
-                            {report.approval_status || 'pending'}
+                            {report.approval_status || "pending"}
                           </Badge>
                         </TableCell>
-                        <TableCell>{new Date(report.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -237,7 +252,9 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem>View details</DropdownMenuItem>
                               <DropdownMenuItem>Edit report</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">
+                                Delete
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -255,7 +272,9 @@ const Dashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage community members and administrators.</CardDescription>
+              <CardDescription>
+                Manage community members and administrators.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -271,7 +290,10 @@ const Dashboard: React.FC = () => {
                 <TableBody>
                   {users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={5}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         No users found.
                       </TableCell>
                     </TableRow>
@@ -281,11 +303,15 @@ const Dashboard: React.FC = () => {
                         <TableCell className="font-medium">{user.id}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          <Badge variant={user.is_admin ? 'default' : 'secondary'}>
-                            {user.is_admin ? 'Admin' : 'User'}
+                          <Badge
+                            variant={user.is_admin ? "default" : "secondary"}
+                          >
+                            {user.is_admin ? "Admin" : "User"}
                           </Badge>
                         </TableCell>
-                        <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(user.created_at).toLocaleDateString()}
+                        </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -296,9 +322,11 @@ const Dashboard: React.FC = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuItem>Edit profile</DropdownMenuItem>
-                              <DropdownMenuItem>Reset password</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Reset password
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 className="text-red-500 cursor-pointer"
                                 onClick={() => handleDeleteUser(user.id)}
                               >
@@ -322,12 +350,16 @@ const Dashboard: React.FC = () => {
             <Card className="col-span-4">
               <CardHeader>
                 <CardTitle>AI Prediction Trends</CardTitle>
-                <CardDescription>Historical accuracy and upcoming predictions.</CardDescription>
+                <CardDescription>
+                  Historical accuracy and upcoming predictions.
+                </CardDescription>
               </CardHeader>
               <CardContent className="h-[300px] flex items-center justify-center border-2 border-dashed rounded-lg m-6 mt-0">
                 <div className="text-center">
                   <TrendingUp className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Prediction Chart Visualization</p>
+                  <p className="text-muted-foreground">
+                    Prediction Chart Visualization
+                  </p>
                 </div>
               </CardContent>
             </Card>

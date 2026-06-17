@@ -24,6 +24,8 @@ import Submit from './pages/SubmitReport'
 import InfoAI from './pages/Info/AI'
 import InfoData from './pages/Info/Data'
 import InfoDocs from './pages/Info/Docs'
+import AdminLayout from './layouts/AdminLayout'
+import Dashboard from './pages/Admin/Dashboard'
 import { MainLayout } from './layouts/MainLayout'
 import './style.css'
 >>>>>>> d53caf0 (feat(Pages): Add new info pages (AI, data and project))
@@ -53,6 +55,14 @@ function App() {
           {/* Placeholder for now */}
 =======
 >>>>>>> d53caf0 (feat(Pages): Add new info pages (AI, data and project))
+        </Route>
+        
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<Dashboard />} /> {/* Placeholder for now */}
+          <Route path="reports" element={<Dashboard />} /> {/* Placeholder for now */}
+          <Route path="ai" element={<Dashboard />} /> {/* Placeholder for now */}
         </Route>
       </Routes>
     </Router>
