@@ -204,7 +204,7 @@ async def health():
     return {"status": "ok"}
 
 
-# crime cases endpoint
+# Bahagian Crime Cases
 @app.post("/api/crime-records", response_model=CrimeRecordResponse)
 def create_record(record: CrimeRecordCreate, db: Session = Depends(get_db)):
     return crud.create_crime_record(db, record)
@@ -213,3 +213,8 @@ def create_record(record: CrimeRecordCreate, db: Session = Depends(get_db)):
 @app.get("/api/crime-records", response_model=list[CrimeRecordResponse])
 def get_records(db: Session = Depends(get_db)):
     return crud.get_all_records(db)
+
+
+@app.get("/api/stats/total-cases")
+def total_cases(db: Session = Depends(get_db)):
+    return crud.get_total_cases(db)

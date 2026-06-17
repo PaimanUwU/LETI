@@ -1,10 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { AlertTriangle, TrendingUp, Users, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function CrimeStatCards() {
+  const [totalCases, setTotalCases] = useState(0);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/stats/total-cases")
+    .then(res => res.json())
+    .then(data => setTotalCases(data.total_cases));
+  },[]);
+  
   const stats = [
     // temporarry data
-    { title: "Total Cases", value: "1,234", icon: AlertTriangle, color: "text-red-500" },
+    { title: "Total Cases", value: totalCases.toLocaleString(), icon: AlertTriangle, color: "text-red-500" },
     { title: "Monthly Trend", value: "+5.2%", icon: TrendingUp, color: "text-orange-500" },
     { title: "Affected Areas", value: "42", icon: Users, color: "text-blue-500" },
     { title: "Resolved Cases", value: "856", icon: Shield, color: "text-green-500" },

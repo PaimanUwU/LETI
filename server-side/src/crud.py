@@ -3,6 +3,7 @@ import hmac
 import os
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from .models import Report, User, CrimeRecords
 from .schemas import UserCreate, ReportCreate, CrimeRecordCreate
@@ -123,3 +124,8 @@ def get_all_records(db: Session):
 
 def get_by_state(db: Session, state: str):
     return db.query(CrimeRecords).filter(CrimeRecords.state == state).all()
+
+
+def get_total_cases(db: Session):
+    total = db.query(func.sum(CrimeRecords.crimes)).scalar()
+    return {"total_cases": total or 0}
