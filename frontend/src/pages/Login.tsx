@@ -42,7 +42,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
+    <div className="h-full flex flex-col items-center justify-center p-4 bg-background">
       <div className="w-full max-w-sm p-8 space-y-6 bg-card rounded-xl border shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Admin Login</h1>
