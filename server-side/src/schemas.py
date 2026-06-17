@@ -1,5 +1,6 @@
 ﻿from pydantic import BaseModel, EmailStr, constr
 from datetime import datetime
+from typing import Optional
 
 # Request schema - what client sends
 class UserCreate(BaseModel):
@@ -28,9 +29,11 @@ class Token(BaseModel):
 class ReportCreate(BaseModel):
     name:str
     phone_number: str
+    type: str
     title: str
     description: str
     location: str
+    approval_status: Optional[str] = "pending"
     
 class ReportResponse(BaseModel):
     id: int
@@ -55,3 +58,11 @@ class CrimePredictionInput(BaseModel):
 class StateHeatmapResponse(BaseModel):
     state: str
     predicted_crimes: float
+
+
+class ReportUpdate(BaseModel):
+    name: Optional[str] = None
+    phone_number: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
