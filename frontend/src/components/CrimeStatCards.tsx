@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { AlertTriangle, TrendingUp, MapPin, Shield } from "lucide-react";
-import { getDashboardStats, type DashboardStats } from "../lib/api";
+import { api, type DashboardStats } from "../lib/api";
 
 export function CrimeStatCards() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    getDashboardStats()
+    api.dashboard.getStats()
       .then(setStats)
       .catch(() => setError(true));
   }, []);
@@ -16,27 +16,27 @@ export function CrimeStatCards() {
   const cards = [
     {
       title: "Total Cases",
-      value: stats ? stats.total_cases.toLocaleString() : "...",
+      value: stats ? (stats.total_cases?.toLocaleString() || "0") : "...",
       icon: AlertTriangle,
       color: "text-red-500",
     },
     {
       title: "Monthly Trend",
       value: stats
-        ? `${stats.monthly_trend_pct > 0 ? "+" : ""}${stats.monthly_trend_pct}%`
+        ? `${(stats.monthly_trend_pct || 0) > 0 ? "+" : ""}${stats.monthly_trend_pct || 0}%`
         : "...",
       icon: TrendingUp,
       color: "text-orange-500",
     },
     {
       title: "Affected Areas",
-      value: stats ? String(stats.affected_areas) : "...",
+      value: stats ? String(stats.affected_areas || 0) : "...",
       icon: MapPin,
       color: "text-blue-500",
     },
     {
       title: "Resolved Cases",
-      value: stats ? stats.resolved_cases.toLocaleString() : "...",
+      value: stats ? (stats.resolved_cases?.toLocaleString() || "0") : "...",
       icon: Shield,
       color: "text-green-500",
     },
