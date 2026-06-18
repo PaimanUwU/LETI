@@ -43,6 +43,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production-12345")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
 
 # create access token
 def create_access_token(data: dict, expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES):
