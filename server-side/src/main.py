@@ -31,13 +31,10 @@ from . import crud
 
 Base.metadata.create_all(bind=engine)
 
+# ── App instance ───────────────────────────────────────────
 app = FastAPI(title="LETI API", version="1.0.0")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production-12345")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-
+# ── CORS ───────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://localhost:5173"],
@@ -199,6 +196,7 @@ async def read_reports(db: Session = Depends(get_db)):
     return crud.get_reports(db)
 
 
+# ── Health check ───────────────────────────────────────────
 @app.get("/health")
 async def health():
     return {"status": "ok"}

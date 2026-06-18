@@ -1,6 +1,6 @@
 ﻿from pydantic import BaseModel, EmailStr, constr
-from datetime import datetime, date
-
+from datetime import datetime
+from typing import Optional
 
 # Request schema - what client sends
 class UserCreate(BaseModel):
@@ -33,6 +33,7 @@ class Token(BaseModel):
 class ReportCreate(BaseModel):
     name: str
     phone_number: str
+    type: str
     title: str
     description: str
     location: str
