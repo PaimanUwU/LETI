@@ -1,12 +1,12 @@
-﻿import hashlib
+import hashlib
 import hmac
 import os
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
-from .models import Report, User, CrimeRecords
-from .schemas import UserCreate, ReportCreate, CrimeRecordCreate
+from ..models.models import User
+from ..models.schemas import UserCreate
+
 
 _PBKDF2_ITERATIONS = 100_000
 
@@ -55,7 +55,11 @@ def authenticate_user(db: Session, email: str, password: str):
 # create a new user
 def create_user(db: Session, user: UserCreate, is_admin: bool = False) -> User:
     hashed_password = hash_password(user.password)
-    db_user = User(email=user.email, hashed_password=hashed_password, is_admin=is_admin)
+    db_user = User(
+        email=user.email,
+        hashed_password=hashed_password,
+        is_admin=is_admin
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

@@ -5,11 +5,11 @@ Report routes — create, read, update.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import crud
-from ..auth import get_current_user, require_admin_or_law_enforcer
-from ..database import get_db
-from ..models import User
-from ..schemas import ReportCreate, ReportResponse, ReportUpdate
+from ..services import crud
+from ..services.auth import get_current_user, require_admin_or_law_enforcer
+from ..utils.database import get_db
+from ..models.models import User
+from ..models.schemas import ReportCreate, ReportResponse, ReportUpdate
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 

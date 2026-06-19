@@ -16,8 +16,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from .database import get_db
-from .models import User
+from ..utils.database import get_db
+from ..models.models import User
 
 # ── Config ─────────────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production-12345")

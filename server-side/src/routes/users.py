@@ -5,10 +5,10 @@ User management routes — admin-only operations.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import crud
-from ..auth import require_admin
-from ..database import get_db
-from ..schemas import UserResponse
+from ..services import crud
+from ..services.auth import require_admin
+from ..utils.database import get_db
+from ..models.schemas import UserResponse
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 

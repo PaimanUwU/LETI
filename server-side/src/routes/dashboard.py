@@ -4,7 +4,7 @@ Dashboard routes — aggregate stats, trends, top-N lists.
 
 from fastapi import APIRouter
 
-from ..ai_utils import (
+from ..services.ai_utils import (
     crime_counts_by_category,
     dashboard_stats,
     dashboard_summary,

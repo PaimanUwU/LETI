@@ -4,8 +4,8 @@ import pandas as pd
 import joblib
 import numpy as np
 
-from .schemas import CrimePredictionInput
-from .district_coordinates import DISTRICT_COORDINATES
+from ..models.schemas import CrimePredictionInput
+from ..utils.district_coordinates import DISTRICT_COORDINATES
 
 # =========================================================
 # PATH CONFIG
@@ -147,34 +147,6 @@ def monthly_trends(district: str | None = None) -> list[dict]:
         .sort_values("month")
         .to_dict("records")
     )
-
-
-def dashboard_summary(limit: int = 10) -> dict:
-    """
-    @desc     Consolidates high-level metrics required to populate the UI dashboard.
-    @header   none - note: this endpoint is intended for internal dashboard use and may not require auth.
-    @body     {int} limit - Constraint parameter passed down to sub-queries.
-    @returns  {dict} A combined dictionary holding rows, totals, and top N lists.
-    """
-    df = load_data()
-
-    if df.empty:
-        return {
-            "total_rows": 0,
-            "total_crimes": 0,
-            "top_districts": [],
-            "top_categories": [],
-            "monthly_trends": []
-        }
-
-    return {
-        "total_rows": len(df),
-        "total_crimes": float(df["crimes"].sum()),
-        "top_districts": top_districts(limit),
-        "top_categories": crime_counts_by_category(limit),
-        "monthly_trends": monthly_trends()
-    }
-
 
 # =========================================================
 # DASHBOARD STAT CARDS
