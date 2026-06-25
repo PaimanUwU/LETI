@@ -1,4 +1,4 @@
-﻿from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr, constr
 from datetime import datetime, date
 from typing import Optional
 
@@ -38,6 +38,7 @@ class ReportCreate(BaseModel):
     title: str
     description: str
     location: str
+    approval_status: Optional[str] = "pending"
 
 
 class ReportResponse(BaseModel):
@@ -53,6 +54,14 @@ class ReportResponse(BaseModel):
         from_attributes = True
 
 
+class ReportUpdate(BaseModel):
+    name: Optional[str] = None
+    phone_number: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+
+
 class CrimePredictionInput(BaseModel):
     district: str
     category: str
@@ -66,7 +75,7 @@ class StateHeatmapResponse(BaseModel):
     predicted_crimes: float
 
 
-# Ni handle for crime reports
+# Crime record schemas
 class CrimeRecordCreate(BaseModel):
     state: str
     district: str

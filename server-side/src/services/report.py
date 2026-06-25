@@ -1,11 +1,7 @@
-import hashlib
-import hmac
-import os
-
 from sqlalchemy.orm import Session
 
-from .models import Report, User
-from .schemas import UserCreate, ReportCreate
+from ..models.models import Report
+from ..models.schemas import ReportCreate
 
 # ═══════════════════════════════════════════════════════════
 # Report CRUD

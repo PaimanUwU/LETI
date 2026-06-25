@@ -5,10 +5,10 @@ Auth routes — login, signup.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import crud
-from ..auth import create_access_token
-from ..database import get_db
-from ..schemas import Token, UserCreate, UserLogin, UserResponse
+from ..services import crud
+from ..services.auth import create_access_token
+from ..utils.database import get_db
+from ..models.schemas import Token, UserCreate, UserLogin, UserResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
