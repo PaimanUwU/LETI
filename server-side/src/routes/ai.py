@@ -1,5 +1,6 @@
 """
 AI / ML routes — prediction, heatmaps.
+Public endpoints — data is sourced from the CSV dataset / ML model.
 """
 
 from typing import Optional

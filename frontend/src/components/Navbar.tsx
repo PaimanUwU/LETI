@@ -84,7 +84,7 @@ export function Navbar() {
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink asChild className={cn(navigationMenuTriggerStyle(), "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground")}>
-              <Link to="/login">Admin Login</Link>
+              <Link to="/login">Portal Login</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
