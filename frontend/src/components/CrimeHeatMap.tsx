@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+
 import {
   Card,
   CardContent,
   CardHeader,
+  CardDescription,
   CardTitle,
   CardFooter,
 } from "./ui/card";
@@ -15,15 +17,16 @@ import {
   DialogHeader,
 } from "./ui/dialog";
 
+import { Input } from "./ui/input";
+
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 if (typeof window !== "undefined") {
   // @ts-ignore
   window.L = L;
 }
-import type { HeatmapPoint, HeatmapFilters } from "../lib/crime";
+import type { HeatmapPoint, HeatmapFilters } from "../lib/api";
 import { api } from "../lib/api";
-import { Input } from "./ui/input";
 import "leaflet/dist/leaflet.css";
 
 interface CrimeHeatLayerProps {
@@ -39,6 +42,7 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
     let heatLayer: any;
 
     const initHeatLayer = async () => {
+      // @ts-ignore
       await import("leaflet.heat");
 
       // @ts-ignore
@@ -76,7 +80,7 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
 
       // @ts-ignore
       heatLayer = L.heatLayer(heatPoints, {
-        radius: 15,
+        radius: 20,
         blur: 4,
         maxZoom: 13,
         max: 1.0,
@@ -344,7 +348,7 @@ export function CrimeHeatMap() {
       </CardHeader>
 
       {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-background/60 backdrop-blur-sm">
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
           <p className="text-sm font-medium animate-pulse text-muted-foreground">
             Updating Threat Intel Map...
           </p>
