@@ -1,5 +1,3 @@
-# LETI
-
 # Test development server
 
 ## For python backend
@@ -17,5 +15,4 @@ npm install
 npm run dev
 
 ```
-
 
