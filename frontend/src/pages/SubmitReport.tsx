@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Link, useNavigate } from "react-router-dom"
 import { api } from "@/lib/api"
+import { CRIME_TYPES_BY_CATEGORY } from "@/lib/constants"
 import { Loader2 } from "lucide-react"
 
 export default function Submit() {
@@ -13,7 +14,8 @@ export default function Submit() {
   const [formData, setFormData] = useState({
     name: "",
     phone_number: "",
-    type: "Theft",
+    category: "property",
+    type: "theft_other",
     title: "",
     description: "",
     location: "",
@@ -101,31 +103,41 @@ export default function Submit() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="category">Category</label>
+              <select
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData({...formData, category: e.target.value, type: CRIME_TYPES_BY_CATEGORY[e.target.value][0].value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="assault">Assault</option>
+                <option value="property">Property</option>
+              </select>
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium leading-none" htmlFor="type">Crime Type</label>
-              <select 
-                id="type" 
+              <select
+                id="type"
                 value={formData.type}
                 onChange={(e) => setFormData({...formData, type: e.target.value})}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <option>Theft</option>
-                <option>Vandalism</option>
-                <option>Assault</option>
-                <option>Robbery</option>
-                <option>Other</option>
+                {CRIME_TYPES_BY_CATEGORY[formData.category]?.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
               </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none" htmlFor="location">Location</label>
-              <input 
-                id="location" 
-                required
-                value={formData.location}
-                onChange={(e) => setFormData({...formData, location: e.target.value})}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                placeholder="e.g. Subang Jaya"
-              />
-            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none" htmlFor="location">Location</label>
+            <input
+              id="location"
+              required
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              placeholder="e.g. Subang Jaya"
+            />
           </div>
 
           <div className="space-y-2">

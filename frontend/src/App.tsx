@@ -8,7 +8,9 @@ import InfoAI from './pages/Info/AI'
 import InfoData from './pages/Info/Data'
 import InfoDocs from './pages/Info/Docs'
 import AdminLayout from './layouts/AdminLayout'
+import LawEnforcerLayout from './layouts/LawEnforcerLayout'
 import Dashboard from './pages/Admin/Dashboard'
+import EnforcerDashboard from './pages/Enforcer/Dashboard'
 import { MainLayout } from './layouts/MainLayout'
 import './style.css'
 
@@ -24,13 +26,20 @@ function App() {
           <Route path="/info/AI" element={<InfoAI />} />
           <Route path="/info/Data" element={<InfoData />} />
         </Route>
-        
+
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<Dashboard />} /> {/* Placeholder for now */}
-          <Route path="reports" element={<Dashboard />} /> {/* Placeholder for now */}
-          <Route path="ai" element={<Dashboard />} /> {/* Placeholder for now */}
+          <Route path="users" element={<Dashboard />} />
+          <Route path="reports" element={<Dashboard />} />
+          <Route path="ai" element={<Dashboard />} />
+        </Route>
+
+        {/* Law Enforcer Routes */}
+        <Route path="/enforcer" element={<LawEnforcerLayout />}>
+          <Route path="dashboard" element={<EnforcerDashboard />} />
+          <Route path="reports" element={<EnforcerDashboard />} />
+          <Route path="ai" element={<EnforcerDashboard />} />
         </Route>
       </Routes>
     </Router>

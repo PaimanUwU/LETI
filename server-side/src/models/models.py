@@ -1,6 +1,23 @@
-﻿from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date
+﻿from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Boolean, DateTime, Date
 from sqlalchemy.sql import func
 from ..utils.database import Base
+
+# Government-defined crime categories and types (from PDRM crime_district.csv)
+VALID_CATEGORIES = ("assault", "property")
+VALID_CRIME_TYPES = (
+    "break_in",
+    "causing_injury",
+    "murder",
+    "rape",
+    "robbery_gang_armed",
+    "robbery_gang_unarmed",
+    "robbery_solo_armed",
+    "robbery_solo_unarmed",
+    "theft_other",
+    "theft_vehicle_lorry",
+    "theft_vehicle_motorcar",
+    "theft_vehicle_motorcycle",
+)
 
 
 class User(Base):
@@ -16,14 +33,43 @@ class User(Base):
 
 class Report(Base):
     __tablename__ = "reports"
+    __table_args__ = (
+        CheckConstraint(
+            "type IN ('break_in','causing_injury','murder','rape',"
+            "'robbery_gang_armed','robbery_gang_unarmed','robbery_solo_armed',"
+            "'robbery_solo_unarmed','theft_other','theft_vehicle_lorry',"
+            "'theft_vehicle_motorcar','theft_vehicle_motorcycle')",
+            name="ck_reports_gov_crime_type",
+        ),
+        CheckConstraint(
+            "category IN ('assault','property')",
+            name="ck_reports_gov_category",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    phone_number = Column(String)
-    type = Column(String)  # "theft", "assault", "vandalism", etc.
+    email = Column(String, index=True)
+    phone_number = Column(String, index=True)
+    category = Column(String, default="property")  # "assault" | "property"
+    type = Column(String)  # constrained to VALID_CRIME_TYPES
     title = Column(String)
     description = Column(String)
     location = Column(String)
+    approval_status = Column(String, default="pending")  # "pending" | "approved" | "rejected"
+    case_id = Column(Integer, ForeignKey("cases.id"), nullable=True, index=True)  # FK to cases
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Case(Base):
+    """An investigation case that bundles related approved reports."""
+    __tablename__ = "cases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, default="Untitled Case")
+    description = Column(String, default="")
+    assigned_to = Column(Integer, nullable=True)                    # FK to users.id (enforcer)
+    notes = Column(String, default="")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
