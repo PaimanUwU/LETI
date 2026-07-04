@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import {
   Users,
@@ -42,56 +41,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
 import type { UserResponse, ReportResponse, DashboardStats } from "@/lib/api";
-=======
-import React, { useEffect, useState } from 'react';
-import { 
-  Users, 
-  FileText, 
-  Cpu, 
-  Plus, 
-  MoreHorizontal, 
-  Search, 
-  TrendingUp, 
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  Loader2
-} from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { api } from '@/lib/api';
-import type { UserResponse, ReportResponse, DashboardStats } from '@/lib/api';
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
 
 const Dashboard: React.FC = () => {
   const [reports, setReports] = useState<ReportResponse[]>([]);
@@ -107,11 +56,7 @@ const Dashboard: React.FC = () => {
         const [reportsData, usersData, stats] = await Promise.all([
           api.reports.getAll(),
           api.users.getAll(),
-<<<<<<< HEAD
           api.dashboard.getStats(),
-=======
-          api.dashboard.getStats()
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
         ]);
         setReports(reportsData);
         setUsers(usersData);
@@ -130,11 +75,7 @@ const Dashboard: React.FC = () => {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         await api.users.delete(id);
-<<<<<<< HEAD
         setUsers(users.filter((u) => u.id !== id));
-=======
-        setUsers(users.filter(u => u.id !== id));
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
       } catch (err: any) {
         alert(err.message);
       }
@@ -150,7 +91,6 @@ const Dashboard: React.FC = () => {
   }
 
   const statCards = [
-<<<<<<< HEAD
     {
       title: "Total Users",
       value: users.length.toString(),
@@ -182,39 +122,6 @@ const Dashboard: React.FC = () => {
       icon: CheckCircle2,
       color: "text-green-500",
       bg: "bg-green-100 dark:bg-green-900/20",
-=======
-    { 
-      title: 'Total Users', 
-      value: users.length.toString(), 
-      description: 'Platform members', 
-      icon: Users,
-      color: 'text-blue-500',
-      bg: 'bg-blue-100 dark:bg-blue-900/20'
-    },
-    { 
-      title: 'Active Reports', 
-      value: reports.length.toString(), 
-      description: 'Community cases', 
-      icon: FileText,
-      color: 'text-orange-500',
-      bg: 'bg-orange-100 dark:bg-orange-900/20'
-    },
-    { 
-      title: 'AI Accuracy', 
-      value: statsData?.accuracy ? `${statsData.accuracy}%` : '92%', 
-      description: 'Model confidence', 
-      icon: Cpu,
-      color: 'text-purple-500',
-      bg: 'bg-purple-100 dark:bg-purple-900/20'
-    },
-    { 
-      title: 'Resolved', 
-      value: statsData?.resolved_cases?.toString() || '0', 
-      description: 'Cases closed', 
-      icon: CheckCircle2,
-      color: 'text-green-500',
-      bg: 'bg-green-100 dark:bg-green-900/20'
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
     },
   ];
 
@@ -222,17 +129,12 @@ const Dashboard: React.FC = () => {
     <div className="space-y-8">
       <div className="flex justify-between items-start">
         <div>
-<<<<<<< HEAD
           <h2 className="text-3xl font-bold tracking-tight">
             Dashboard Overview
           </h2>
           <p className="text-muted-foreground">
             Manage your platform and monitor AI performance.
           </p>
-=======
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
-          <p className="text-muted-foreground">Manage your platform and monitor AI performance.</p>
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
         </div>
         {error && (
           <Badge variant="destructive" className="animate-pulse">
@@ -307,21 +209,16 @@ const Dashboard: React.FC = () => {
                 <TableBody>
                   {reports.length === 0 ? (
                     <TableRow>
-<<<<<<< HEAD
                       <TableCell
                         colSpan={6}
                         className="text-center py-8 text-muted-foreground"
                       >
-=======
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                         No reports found.
                       </TableCell>
                     </TableRow>
                   ) : (
                     reports.map((report) => (
                       <TableRow key={report.id}>
-<<<<<<< HEAD
                         <TableCell className="font-medium">
                           REP-{report.id}
                         </TableCell>
@@ -343,22 +240,6 @@ const Dashboard: React.FC = () => {
                         <TableCell>
                           {new Date(report.created_at).toLocaleDateString()}
                         </TableCell>
-=======
-                        <TableCell className="font-medium">REP-{report.id}</TableCell>
-                        <TableCell>{report.title}</TableCell>
-                        <TableCell>{report.location}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={
-                              report.approval_status === 'resolved' ? 'secondary' : 
-                              report.approval_status === 'pending' ? 'outline' : 'default'
-                            }
-                          >
-                            {report.approval_status || 'pending'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(report.created_at).toLocaleDateString()}</TableCell>
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -371,13 +252,9 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem>View details</DropdownMenuItem>
                               <DropdownMenuItem>Edit report</DropdownMenuItem>
                               <DropdownMenuSeparator />
-<<<<<<< HEAD
                               <DropdownMenuItem className="text-red-500">
                                 Delete
                               </DropdownMenuItem>
-=======
-                              <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -413,14 +290,10 @@ const Dashboard: React.FC = () => {
                 <TableBody>
                   {users.length === 0 ? (
                     <TableRow>
-<<<<<<< HEAD
                       <TableCell
                         colSpan={5}
                         className="text-center py-8 text-muted-foreground"
                       >
-=======
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                         No users found.
                       </TableCell>
                     </TableRow>
@@ -430,7 +303,6 @@ const Dashboard: React.FC = () => {
                         <TableCell className="font-medium">{user.id}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-<<<<<<< HEAD
                           <Badge
                             variant={user.is_admin ? "default" : "secondary"}
                           >
@@ -440,13 +312,6 @@ const Dashboard: React.FC = () => {
                         <TableCell>
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
-=======
-                          <Badge variant={user.is_admin ? 'default' : 'secondary'}>
-                            {user.is_admin ? 'Admin' : 'User'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -457,17 +322,11 @@ const Dashboard: React.FC = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuItem>Edit profile</DropdownMenuItem>
-<<<<<<< HEAD
                               <DropdownMenuItem>
                                 Reset password
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-=======
-                              <DropdownMenuItem>Reset password</DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem 
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
                                 className="text-red-500 cursor-pointer"
                                 onClick={() => handleDeleteUser(user.id)}
                               >

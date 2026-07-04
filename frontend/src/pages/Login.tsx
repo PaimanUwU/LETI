@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
-=======
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Link, useNavigate } from "react-router-dom"
-import { api } from "@/lib/api"
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,15 +16,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-<<<<<<< HEAD
       const data = await api.auth.login({ email, password });
       localStorage.setItem("token", data.access_token);
       navigate("/admin/dashboard");
-=======
-      const data = await api.auth.login({ email, password })
-      localStorage.setItem("token", data.access_token)
-      navigate("/admin/dashboard")
->>>>>>> 60b4210 (refactor(API): Add new separation to the ai and organized them into one file)
     } catch (err: any) {
       setError(err.message);
     } finally {

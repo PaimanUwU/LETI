@@ -3,6 +3,8 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
+import { ChartColumnBig } from "lucide-react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./ui/chart";
 import { api } from "../lib/api";
@@ -11,7 +13,7 @@ import type { Distribution } from "../lib/api";
 const chartConfig = {
   crimes: {
     label: "Total Crimes",
-    color: "hsl(var(--chart-1))",
+    color: "#145DFC",
   },
 };
 
@@ -73,7 +75,10 @@ export function CrimeTypeDistribution() {
     /* 1. Added 'flex flex-col' to the main Card container */
     <Card className="w-full h-full max-w-2xl flex flex-col">
       <CardHeader>
-        <CardTitle>Crime Distribution</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <ChartColumnBig className="h-5 w-5 text-blue-600" />
+          Crime Distribution
+        </CardTitle>
       </CardHeader>
 
       {/* 2. Added 'flex-1 min-h-0' to let content fill the card and contain the chart cleanly */}

@@ -3,19 +3,7 @@ import { CrimeTrendChart } from "../components/CrimeTrendChart";
 import { CrimeTypeDistribution } from "../components/CrimeTypeDistribution";
 import { CrimeStatCards } from "../components/CrimeStatCards";
 import { CrimePrediction } from "../components/CrimePrediction";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
+import { DetailedAnalytics } from "../components/DetailedAnalytics";
 
 export default function Home() {
   return (
@@ -54,39 +42,8 @@ export default function Home() {
         <CrimePrediction />
       </div>
 
-      {/* Additional Analytics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Detailed Analytics</CardTitle>
-          <CardDescription>
-            Explore crime data by different dimensions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="district" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="district">By District</TabsTrigger>
-              <TabsTrigger value="time">By Time</TabsTrigger>
-              <TabsTrigger value="severity">By Severity</TabsTrigger>
-            </TabsList>
-            <TabsContent value="district" className="mt-4">
-              <div className="text-sm text-muted-foreground">
-                District-level crime analysis will be displayed here
-              </div>
-            </TabsContent>
-            <TabsContent value="time" className="mt-4">
-              <div className="text-sm text-muted-foreground">
-                Time-based crime patterns will be displayed here
-              </div>
-            </TabsContent>
-            <TabsContent value="severity" className="mt-4">
-              <div className="text-sm text-muted-foreground">
-                Crime severity analysis will be displayed here
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      {/* Detailed Analytics */}
+      <DetailedAnalytics />
     </div>
   );
 }

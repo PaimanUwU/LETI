@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 "use client"
 
->>>>>>> 8b9e1fc (feat(UI): Add new ui component)
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 

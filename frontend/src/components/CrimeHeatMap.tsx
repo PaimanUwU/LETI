@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardDescription,
   CardTitle,
   CardFooter,
 } from "./ui/card";
@@ -16,6 +15,8 @@ import {
   DialogTitle,
   DialogHeader,
 } from "./ui/dialog";
+
+import { Map } from "lucide-react";
 
 import { Input } from "./ui/input";
 
@@ -81,12 +82,12 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
       // @ts-ignore
       heatLayer = L.heatLayer(heatPoints, {
         radius: 20,
-        blur: 4,
+        blur: 5,
         maxZoom: 13,
-        max: 1.0,
+        max: 0.5,
         gradient: {
           0.2: "#ea580c",
-          1.0: "#dc2626",
+          0.5: "#dc2626",
         },
       }).addTo(map);
     };
@@ -266,7 +267,10 @@ export function CrimeHeatMap() {
   return (
     <Card className="h-full relative overflow-hidden">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-4">
-        <CardTitle>Crime Heat Map</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Map className="h-5 w-5 text-[--primary]" />
+          Crime Heat Map
+        </CardTitle>
         <div className="flex flex-wrap items-center gap-2">
           {/* State Selector */}
           <select
