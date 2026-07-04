@@ -42,9 +42,44 @@ export interface CrimePredictionInput {
   month: number;
 }
 
+export interface HeatmapPoint {
+  latitude: number;
+  longitude: number;
+  intensity: number;
+}
+
+export interface HeatmapFilters {
+  state?: string;
+  category?: string;
+  type?: string;
+  year?: number;
+  month?: number;
+  limit?: number;
+}
+
+export interface Distribution {
+  label: string;
+  value: number;
+  color: string;
+  labelX: number;
+  labelY: number;
+  textAnchor: "start" | "end" | "middle";
+}
+
+export interface Trend {
+  month: string;
+  Theft: number;
+  Assault: number;
+  Burglary: number;
+  Robbery: number;
+}
+
 // --- Helper ---
 
-async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function apiFetch<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
   const token = localStorage.getItem("token");
   const headers = {
     "Content-Type": "application/json",
@@ -59,8 +94,10 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const message = errorData.detail 
-      ? (typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail))
+    const message = errorData.detail
+      ? typeof errorData.detail === "string"
+        ? errorData.detail
+        : JSON.stringify(errorData.detail)
       : `API Error: ${response.status} ${response.statusText}`;
     throw new Error(message);
   }
@@ -73,40 +110,67 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
 export const api = {
   auth: {
-    login: (data: any) => apiFetch<Token>("/api/auth/login", { method: "POST", body: JSON.stringify(data) }),
-    signup: (data: any) => apiFetch<UserResponse>("/api/auth/signup", { method: "POST", body: JSON.stringify(data) }),
+    login: (data: any) =>
+      apiFetch<Token>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    signup: (data: any) =>
+      apiFetch<UserResponse>("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
   },
   users: {
     getAll: () => apiFetch<UserResponse[]>("/api/users"),
     getOne: (userId: number) => apiFetch<UserResponse>(`/api/users/${userId}`),
-    delete: (userId: number) => apiFetch<void>(`/api/users/${userId}`, { method: "DELETE" }),
+    delete: (userId: number) =>
+      apiFetch<void>(`/api/users/${userId}`, { method: "DELETE" }),
   },
   dashboard: {
     getStats: () => apiFetch<DashboardStats>("/api/dashboard/stats"),
-    getSummary: (limit = 10) => apiFetch<any>(`/api/dashboard/summary?limit=${limit}`),
-    getTopDistricts: (limit = 10) => apiFetch<any>(`/api/dashboard/top-districts?limit=${limit}`),
-    getCrimeCountsByCategory: (limit = 10) => apiFetch<any>(`/api/dashboard/crime-counts-by-category?limit=${limit}`),
-    getMonthlyTrends: (district?: string) => 
-      apiFetch<any>(`/api/dashboard/monthly-trends${district ? `?district=${encodeURIComponent(district)}` : ""}`),
+    getSummary: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/summary?limit=${limit}`),
+    getTopDistricts: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/top-districts?limit=${limit}`),
+    getCrimeCountsByCategory: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/crime-counts-by-category?limit=${limit}`),
+    getMonthlyTrends: (district?: string) =>
+      apiFetch<any>(
+        `/api/dashboard/monthly-trends${district ? `?district=${encodeURIComponent(district)}` : ""}`,
+      ),
   },
   ai: {
-    predict: (data: CrimePredictionInput) => apiFetch<any>("/api/ai/predict", { method: "POST", body: JSON.stringify(data) }),
+    predict: (data: CrimePredictionInput) =>
+      apiFetch<any>("/api/ai/predict", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     getHeatmap: (params: any = {}) => {
       const query = new URLSearchParams(params).toString();
       return apiFetch<any>(`/api/ai/heatmap${query ? `?${query}` : ""}`);
     },
     getHeatmapPredictions: (params: any = {}) => {
       const query = new URLSearchParams(params).toString();
-      return apiFetch<any>(`/api/ai/heatmap_predictions${query ? `?${query}` : ""}`);
+      return apiFetch<any>(
+        `/api/ai/heatmap_predictions${query ? `?${query}` : ""}`,
+      );
     },
   },
   reports: {
     getAll: () => apiFetch<ReportResponse[]>("/api/reports"),
-    create: (data: any) => apiFetch<ReportResponse>("/api/reports", { method: "POST", body: JSON.stringify(data) }),
-    update: (reportId: number, data: any) => 
-      apiFetch<ReportResponse>(`/api/reports/${reportId}`, { method: "PATCH", body: JSON.stringify(data) }),
+    create: (data: any) =>
+      apiFetch<ReportResponse>("/api/reports", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (reportId: number, data: any) =>
+      apiFetch<ReportResponse>(`/api/reports/${reportId}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
   },
   health: {
     check: () => apiFetch<any>("/health"),
-  }
+  },
 };

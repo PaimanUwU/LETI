@@ -3,15 +3,28 @@ import { CrimeTrendChart } from "../components/CrimeTrendChart";
 import { CrimeTypeDistribution } from "../components/CrimeTypeDistribution";
 import { CrimeStatCards } from "../components/CrimeStatCards";
 import { CrimePrediction } from "../components/CrimePrediction";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 
 export default function Home() {
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Crime Intelligence Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Crime Intelligence Dashboard
+        </h1>
         <p className="text-muted-foreground">
           Real-time crime statistics and predictive analytics for Malaysia
         </p>
