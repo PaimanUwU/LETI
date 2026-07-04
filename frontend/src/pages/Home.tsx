@@ -53,7 +53,7 @@ export default function Home() {
           <Tabs defaultValue="district" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="district">By District</TabsTrigger>
-              <TabsTrigger value="time">By Time</TabsTrigger>
+              <TabsTrigger value="time">By Year</TabsTrigger>
               <TabsTrigger value="severity">By Severity</TabsTrigger>
             </TabsList>
             <TabsContent value="district" className="mt-4">

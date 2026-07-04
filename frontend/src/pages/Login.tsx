@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Link, useNavigate } from "react-router-dom"
+import { api } from "@/lib/api"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -15,25 +16,9 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/login", {
-
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        const errorMsg = typeof data.detail === "string" 
-          ? data.detail 
-          : data.detail?.[0]?.msg || "Invalid credentials"
-        throw new Error(errorMsg)
-      }
-
+      const data = await api.auth.login({ email, password })
       localStorage.setItem("token", data.access_token)
-
-      navigate("/")
+      navigate("/admin/dashboard")
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -42,7 +27,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
+    <div className="h-full flex flex-col items-center justify-center p-4 bg-background">
       <div className="w-full max-w-sm p-8 space-y-6 bg-card rounded-xl border shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Admin Login</h1>
