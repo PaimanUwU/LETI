@@ -1,19 +1,19 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Link, useNavigate } from "react-router-dom"
-import { api } from "@/lib/api"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
+import { api } from "@/lib/api";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const data = await api.auth.login({ email, password })
@@ -25,29 +25,33 @@ export default function Login() {
         navigate("/admin/dashboard")
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-4 bg-background">
       <div className="w-full max-w-sm p-8 space-y-6 bg-card rounded-xl border shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Admin Login</h1>
-          <p className="text-sm text-muted-foreground">Enter your credentials to access the dashboard</p>
+          <p className="text-sm text-muted-foreground">
+            Enter your credentials to access the dashboard
+          </p>
         </div>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           {error && (
             <div className="p-3 text-sm bg-destructive/10 border border-destructive/20 text-destructive rounded-md">
               {error}
             </div>
           )}
-          
+
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
+            <label className="text-sm font-medium leading-none" htmlFor="email">
+              Email
+            </label>
             <input
               id="email"
               value={email}
@@ -60,7 +64,12 @@ export default function Login() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none" htmlFor="password">Password</label>
+            <label
+              className="text-sm font-medium leading-none"
+              htmlFor="password"
+            >
+              Password
+            </label>
             <input
               id="password"
               value={password}
@@ -78,9 +87,11 @@ export default function Login() {
         </form>
 
         <div className="text-center">
-          <Link to="/" className="text-sm text-primary hover:underline">Back to Home</Link>
+          <Link to="/" className="text-sm text-primary hover:underline">
+            Back to Home
+          </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

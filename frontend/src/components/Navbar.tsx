@@ -1,18 +1,14 @@
 import { Link } from "react-router-dom";
-import { 
-  NavigationMenu, 
-  NavigationMenuItem, 
-  NavigationMenuLink, 
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuContent,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle 
+  navigationMenuTriggerStyle,
 } from "../components/ui/navigation-menu";
-import { 
-  Shield,
-  Brain,
-  ChartNoAxesCombined,
-} from "lucide-react";
+import { Shield, Brain, ChartNoAxesCombined } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -92,4 +88,3 @@ export function Navbar() {
     </div>
   );
 }
-

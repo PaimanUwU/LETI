@@ -27,6 +27,9 @@ import { Input } from '@/components/ui/input';
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+  { icon: Users, label: 'Users', path: '/admin/users' },
+  { icon: FileText, label: 'Reports', path: '/admin/reports' },
+  { icon: Cpu, label: 'AI Insights', path: '/admin/ai' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
@@ -43,7 +46,7 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
-      <aside
+      <aside 
         className={cn(
           "bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out flex flex-col",
           isSidebarOpen ? "w-64" : "w-20"
@@ -96,19 +99,19 @@ const AdminLayout: React.FC = () => {
         {/* Header */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10">
           <div className="flex items-center gap-4 flex-1">
-            <Button
-              variant="ghost"
-              size="icon"
+            <Button 
+              variant="ghost" 
+              size="icon" 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="md:flex hidden"
             >
               <Menu className="h-5 w-5" />
             </Button>
-
+            
             <div className="relative max-w-md w-full hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search anything..."
+              <Input 
+                placeholder="Search anything..." 
                 className="pl-10 bg-slate-100/50 border-none focus-visible:ring-1 focus-visible:ring-primary"
               />
             </div>
@@ -119,7 +122,7 @@ const AdminLayout: React.FC = () => {
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
             </Button>
-
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">

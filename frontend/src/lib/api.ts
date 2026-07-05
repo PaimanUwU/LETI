@@ -101,24 +101,42 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
 export const api = {
   auth: {
-    login: (data: any) => apiFetch<Token>("/api/auth/login", { method: "POST", body: JSON.stringify(data) }),
-    signup: (data: any) => apiFetch<UserResponse>("/api/auth/signup", { method: "POST", body: JSON.stringify(data) }),
+    login: (data: any) =>
+      apiFetch<Token>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    signup: (data: any) =>
+      apiFetch<UserResponse>("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
   },
   users: {
     getAll: () => apiFetch<UserResponse[]>("/api/users"),
     getOne: (userId: number) => apiFetch<UserResponse>(`/api/users/${userId}`),
-    delete: (userId: number) => apiFetch<void>(`/api/users/${userId}`, { method: "DELETE" }),
+    delete: (userId: number) =>
+      apiFetch<void>(`/api/users/${userId}`, { method: "DELETE" }),
   },
   dashboard: {
     getStats: () => apiFetch<DashboardStats>("/api/dashboard/stats"),
-    getSummary: (limit = 10) => apiFetch<any>(`/api/dashboard/summary?limit=${limit}`),
-    getTopDistricts: (limit = 10) => apiFetch<any>(`/api/dashboard/top-districts?limit=${limit}`),
-    getCrimeCountsByCategory: (limit = 10) => apiFetch<any>(`/api/dashboard/crime-counts-by-category?limit=${limit}`),
-    getMonthlyTrends: (year?: number) =>
-      apiFetch<any>(`/api/dashboard/monthly-trends${year ? `?year=${year}` : ""}`),
+    getSummary: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/summary?limit=${limit}`),
+    getTopDistricts: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/top-districts?limit=${limit}`),
+    getCrimeCountsByCategory: (limit = 10) =>
+      apiFetch<any>(`/api/dashboard/crime-counts-by-category?limit=${limit}`),
+    getMonthlyTrends: (district?: string) =>
+      apiFetch<any>(
+        `/api/dashboard/monthly-trends${district ? `?district=${encodeURIComponent(district)}` : ""}`,
+      ),
   },
   ai: {
-    predict: (data: CrimePredictionInput) => apiFetch<any>("/api/ai/predict", { method: "POST", body: JSON.stringify(data) }),
+    predict: (data: CrimePredictionInput) =>
+      apiFetch<any>("/api/ai/predict", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     getHeatmap: (params: any = {}) => {
       const query = new URLSearchParams(params).toString();
       return apiFetch<any>(`/api/ai/heatmap${query ? `?${query}` : ""}`);

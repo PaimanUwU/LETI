@@ -43,7 +43,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
-  )
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
