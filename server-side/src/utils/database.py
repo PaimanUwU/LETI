@@ -74,6 +74,7 @@ def _migrate():
                     name VARCHAR NOT NULL,
                     email VARCHAR DEFAULT '',
                     phone_number VARCHAR NOT NULL,
+                    ic_number VARCHAR DEFAULT '',
                     category VARCHAR NOT NULL DEFAULT 'property'
                         CHECK(category IN ('assault','property')),
                     type VARCHAR NOT NULL CHECK(type IN (
@@ -84,15 +85,39 @@ def _migrate():
                         'theft_vehicle_motorcar','theft_vehicle_motorcycle'
                     )),
                     title VARCHAR NOT NULL,
+                    incident_date DATE,
+                    incident_time TIME,
                     description VARCHAR NOT NULL,
                     location VARCHAR NOT NULL,
                     approval_status VARCHAR DEFAULT 'pending',
+                    case_id INTEGER,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             cur.execute("INSERT INTO reports_new SELECT * FROM reports")
             cur.execute("DROP TABLE reports")
             cur.execute("ALTER TABLE reports_new RENAME TO reports")
+            conn.commit()
+
+        # Add `ic_number` column to reports if it doesn't exist
+        cur.execute("PRAGMA table_info(reports)")
+        columns = [row[1] for row in cur.fetchall()]
+        if "ic_number" not in columns:
+            cur.execute("ALTER TABLE reports ADD COLUMN ic_number VARCHAR DEFAULT ''")
+            conn.commit()
+
+        # Add `incident_date` column to reports if it doesn't exist
+        cur.execute("PRAGMA table_info(reports)")
+        columns = [row[1] for row in cur.fetchall()]
+        if "incident_date" not in columns:
+            cur.execute("ALTER TABLE reports ADD COLUMN incident_date DATE")
+            conn.commit()
+
+        # Add `incident_time` column to reports if it doesn't exist
+        cur.execute("PRAGMA table_info(reports)")
+        columns = [row[1] for row in cur.fetchall()]
+        if "incident_time" not in columns:
+            cur.execute("ALTER TABLE reports ADD COLUMN incident_time TIME")
             conn.commit()
 
         # Add `case_id` column to reports if it doesn't exist

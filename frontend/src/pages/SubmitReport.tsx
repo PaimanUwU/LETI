@@ -14,9 +14,13 @@ export default function Submit() {
   const [formData, setFormData] = useState({
     name: "",
     phone_number: "",
+    ic_number: "",
+    email: "",
     category: "property",
     type: "theft_other",
     title: "",
+    incident_date: "",
+    incident_time: "",
     description: "",
     location: "",
   })
@@ -67,8 +71,8 @@ export default function Submit() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none" htmlFor="name">Full Name</label>
-              <input 
-                id="name" 
+              <input
+                id="name"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -77,9 +81,23 @@ export default function Submit() {
               />
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="ic_number">IC Number</label>
+              <input
+                id="ic_number"
+                required
+                value={formData.ic_number}
+                onChange={(e) => setFormData({...formData, ic_number: e.target.value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                placeholder="e.g. 901231-01-1234"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
               <label className="text-sm font-medium leading-none" htmlFor="phone">Phone Number</label>
-              <input 
-                id="phone" 
+              <input
+                id="phone"
                 required
                 value={formData.phone_number}
                 onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
@@ -87,12 +105,24 @@ export default function Submit() {
                 placeholder="+60..."
               />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                placeholder="you@example.com"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none" htmlFor="title">Report Title</label>
-            <input 
-              id="title" 
+            <input
+              id="title"
               required
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -128,6 +158,32 @@ export default function Submit() {
               </select>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="incident_date">Incident Date</label>
+              <input
+                id="incident_date"
+                type="date"
+                required
+                value={formData.incident_date}
+                onChange={(e) => setFormData({...formData, incident_date: e.target.value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="incident_time">Incident Time</label>
+              <input
+                id="incident_time"
+                type="time"
+                required
+                value={formData.incident_time}
+                onChange={(e) => setFormData({...formData, incident_time: e.target.value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none" htmlFor="location">Location</label>
             <input
