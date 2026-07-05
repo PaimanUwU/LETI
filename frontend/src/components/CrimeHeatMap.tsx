@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import {
   Card,
@@ -18,14 +18,14 @@ import {
 
 import { Map } from "lucide-react";
 
-import { Input } from "./ui/input";
-
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
+
 if (typeof window !== "undefined") {
   // @ts-ignore
   window.L = L;
 }
+
 import type { HeatmapPoint, HeatmapFilters } from "../lib/api";
 import { api } from "../lib/api";
 import "leaflet/dist/leaflet.css";
@@ -36,11 +36,10 @@ interface CrimeHeatLayerProps {
 
 export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
   const map = useMap();
+  const heatLayerRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!map || !points.length) return;
-
-    let heatLayer: any;
+    if (!map) return;
 
     const initHeatLayer = async () => {
       // @ts-ignore
@@ -53,6 +52,13 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
         );
         return;
       }
+
+      if (heatLayerRef.current) {
+        map.removeLayer(heatLayerRef.current);
+        heatLayerRef.current = null;
+      }
+
+      if (!points || points.length === 0) return;
 
       const heatPoints = points.map(
         (p) =>
@@ -79,15 +85,19 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
         });
       }
 
+      // 1. Amplified Heat Configuration for Higher Visibility
       // @ts-ignore
-      heatLayer = L.heatLayer(heatPoints, {
-        radius: 20,
-        blur: 5,
+      heatLayerRef.current = L.heatLayer(heatPoints, {
+        radius: 28, // Increased from 20 to 28 to make individual points larger and smoother
+        blur: 12, // Increased from 5 to 12 for smoother transitions and glowing blending effects
         maxZoom: 13,
-        max: 0.5,
+        max: 0.3, // Lowered max threshold from 0.5 to 0.3, making warm spots highlight much quicker
         gradient: {
-          0.2: "#ea580c",
-          0.5: "#dc2626",
+          0.1: "#3b82f6", // Blue (Low Density backdrop glow)
+          0.3: "#10b981", // Green
+          0.5: "#eab308", // Yellow
+          0.7: "#f97316", // Orange
+          1.0: "#dc2626", // Deep Red (High Density Core)
         },
       }).addTo(map);
     };
@@ -95,8 +105,8 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
     initHeatLayer();
 
     return () => {
-      if (heatLayer && map) {
-        map.removeLayer(heatLayer);
+      if (heatLayerRef.current && map) {
+        map.removeLayer(heatLayerRef.current);
       }
     };
   }, [map, points]);
@@ -104,16 +114,27 @@ export function CrimeHeatLayer({ points }: CrimeHeatLayerProps) {
   return null;
 }
 
+function ResizeMap() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 export function CrimeHeatMap() {
   const [heatmapData, setHeatmapData] = useState<HeatmapPoint[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isOpen, setIsOpen] = useState(false); // Controls the modal open state
+  const [isOpen, setIsOpen] = useState(false);
 
   const [filters, setFilters] = useState<HeatmapFilters>({
     state: "",
     category: "",
     type: "",
-    year: 2023,
+    year: undefined,
   });
 
   const malaysiaCenter: [number, number] = [3.139, 101.6869];
@@ -177,6 +198,8 @@ export function CrimeHeatMap() {
     { value: "property", label: "Property Crime" },
   ];
 
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
+
   const months = [
     { value: "1", label: "January" },
     { value: "2", label: "February" },
@@ -220,7 +243,6 @@ export function CrimeHeatMap() {
       label: "Robbery without Firearms",
       parentCategory: "assault",
     },
-
     { value: "theft", label: "Theft", parentCategory: "property" },
     {
       value: "theft_of_motor_vehicle",
@@ -253,14 +275,17 @@ export function CrimeHeatMap() {
     ? crimeTypes.filter((t) => t.parentCategory === filters.category)
     : crimeTypes;
 
-  // Shared Map Component Content to keep things DRY
   const renderMap = () => (
     <MapContainer center={malaysiaCenter} zoom={10} className="w-full h-full">
+      {/* 2. Swapped traditional OSM out for the beautiful minimal CartoDB Positron basemap */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={20}
       />
-      {heatmapData.length > 0 && <CrimeHeatLayer points={heatmapData} />}
+      <ResizeMap />
+      <CrimeHeatLayer points={heatmapData} />
     </MapContainer>
   );
 
@@ -268,7 +293,7 @@ export function CrimeHeatMap() {
     <Card className="h-full relative overflow-hidden">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Map className="h-5 w-5 text-[--primary]" />
+          <Map className="h-5 w-5 text-primary" />
           Crime Heat Map
         </CardTitle>
         <div className="flex flex-wrap items-center gap-2">
@@ -316,10 +341,8 @@ export function CrimeHeatMap() {
             ))}
           </select>
 
-          {/* Year Input */}
-          <Input
-            type="number"
-            placeholder="Year"
+          {/* Year Dropdown */}
+          <select
             value={filters.year || ""}
             onChange={(e) =>
               setFilters({
@@ -327,8 +350,15 @@ export function CrimeHeatMap() {
                 year: e.target.value ? Number(e.target.value) : undefined,
               })
             }
-            className="h-8 w-20 px-2 py-1 rounded-md border border-input text-xs bg-background"
-          />
+            className="h-8 rounded-md border border-input bg-background px-2 py-1 text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="">All Years</option>
+            {availableYears.map((yr) => (
+              <option key={yr} value={yr}>
+                {yr}
+              </option>
+            ))}
+          </select>
 
           {/* Month Selector */}
           <select
@@ -352,7 +382,7 @@ export function CrimeHeatMap() {
       </CardHeader>
 
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm z-50">
           <p className="text-sm font-medium animate-pulse text-muted-foreground">
             Updating Threat Intel Map...
           </p>
@@ -361,12 +391,11 @@ export function CrimeHeatMap() {
 
       {/* Primary Map View Container */}
       <CardContent className="h-[450px] p-6 pt-0">
-        <div className="w-full h-full rounded-md border overflow-hidden">
+        <div className="w-full h-full rounded-md border overflow-hidden relative z-0">
           {renderMap()}
         </div>
       </CardContent>
 
-      {/* Dynamic Modal Implementation */}
       <CardFooter>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
@@ -374,11 +403,11 @@ export function CrimeHeatMap() {
               Expand Map
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[90vw] w-[90vw] h-[85vh] flex flex-col p-6">
+          <DialogContent className="w-[95vw]! max-w-[95vw]! h-[90vh] flex flex-col p-4 z-[10000]">
             <DialogHeader className="pb-2">
               <DialogTitle>Crime Heat Map (Full View)</DialogTitle>
             </DialogHeader>
-            <div className="flex-1 w-full rounded-md border overflow-hidden relative">
+            <div className="flex-1 w-full rounded-md border overflow-hidden relative z-0">
               {isOpen && renderMap()}
             </div>
           </DialogContent>
