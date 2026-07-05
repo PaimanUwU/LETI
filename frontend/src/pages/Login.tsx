@@ -16,9 +16,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const data = await api.auth.login({ email, password });
-      localStorage.setItem("token", data.access_token);
-      navigate("/admin/dashboard");
+      const data = await api.auth.login({ email, password })
+      localStorage.setItem("token", data.access_token)
+      // Role-based redirect
+      if (data.role === "law_enforcer") {
+        navigate("/enforcer/dashboard")
+      } else {
+        navigate("/admin/dashboard")
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -8,8 +8,8 @@ mounted here so main.py stays lean.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import engine, Base
-from .routes import ai, auth, dashboard, reports, users
+from .utils.database import engine, Base
+from .routes import ai, auth, cases, dashboard, reports, users
 
 # ── Create tables ──────────────────────────────────────────
 Base.metadata.create_all(bind=engine)
@@ -32,6 +32,7 @@ app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(ai.router)
 app.include_router(reports.router)
+app.include_router(cases.router)
 
 
 # ── Health check ───────────────────────────────────────────

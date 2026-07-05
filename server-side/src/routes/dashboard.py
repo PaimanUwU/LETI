@@ -1,13 +1,13 @@
 """
 Dashboard routes — aggregate stats, trends, top-N lists.
+Public endpoints — data is sourced from the CSV dataset, not user data.
 """
 
 from fastapi import APIRouter
 
-from ..ai_utils import (
+from ..services.ai_utils import (
     crime_counts_by_category,
     dashboard_stats,
-    dashboard_summary,
     monthly_trends,
     top_districts,
 )
@@ -18,12 +18,6 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 @router.get("/stats")
 async def get_dashboard_stats():
     return dashboard_stats()
-
-
-@router.get("/summary")
-async def get_dashboard_summary(limit: int = 10):
-    return dashboard_summary(limit)
-
 
 @router.get("/top-districts")
 async def get_top_districts(limit: int = 10):
@@ -36,5 +30,5 @@ async def get_crime_counts_by_category(limit: int = 10):
 
 
 @router.get("/monthly-trends")
-async def get_monthly_trends(district: str | None = None):
-    return monthly_trends(district)
+async def get_monthly_trends(year: int | None = None):
+    return monthly_trends(year)

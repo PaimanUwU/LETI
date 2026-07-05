@@ -1,17 +1,18 @@
 """
 AI / ML routes — prediction, heatmaps.
+Public endpoints — data is sourced from the CSV dataset / ML model.
 """
 
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 
-from ..ai_utils import (
+from ..services.ai_utils import (
     generate_heatmap_data,
     generate_state_heatmap_predictions,
     run_ml_prediction,
 )
-from ..schemas import CrimePredictionInput
+from ..models.schemas import CrimePredictionInput
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 

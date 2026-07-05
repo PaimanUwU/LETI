@@ -5,15 +5,15 @@ Auth routes — login, signup.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import crud
-from ..auth import create_access_token
-from ..database import get_db
-from ..schemas import Token, UserCreate, UserLogin, UserResponse
+from ..services import crud
+from ..services.auth import create_access_token
+from ..utils.database import get_db
+from ..models.schemas import Token, UserCreate, UserLogin, UserResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = crud.authenticate_user(db, user.email, user.password)
     if not db_user:
@@ -24,7 +24,12 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
         "is_admin": db_user.is_admin,
         "role": getattr(db_user, "role", "user"),
     })
-    return {"access_token": token, "token_type": "bearer"}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "role": getattr(db_user, "role", "user"),
+        "is_admin": db_user.is_admin,
+    }
 
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)

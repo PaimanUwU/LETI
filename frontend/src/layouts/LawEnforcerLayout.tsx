@@ -2,19 +2,17 @@ import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
   FileText,
   Cpu,
-  Settings,
   LogOut,
   Bell,
-  Search,
   Menu,
-  ShieldCheck,
+  BadgeCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,17 +21,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-  { icon: Users, label: 'Users', path: '/admin/users' },
-  { icon: FileText, label: 'Reports', path: '/admin/reports' },
-  { icon: Cpu, label: 'AI Insights', path: '/admin/ai' },
-  { icon: Settings, label: 'Settings', path: '/admin/settings' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/enforcer/dashboard' },
 ];
 
-const AdminLayout: React.FC = () => {
+const LawEnforcerLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
@@ -46,17 +39,22 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
           "bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out flex flex-col",
           isSidebarOpen ? "w-64" : "w-20"
         )}
       >
         <div className="p-6 flex items-center gap-3">
-          <div className="bg-primary p-2 rounded-lg">
-            <ShieldCheck className="h-6 w-6 text-primary-foreground" />
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <BadgeCheck className="h-6 w-6 text-white" />
           </div>
-          {isSidebarOpen && <span className="font-bold text-xl tracking-tight">LETI Admin</span>}
+          {isSidebarOpen && (
+            <div>
+              <span className="font-bold text-xl tracking-tight">LETI</span>
+              <span className="text-xs text-muted-foreground block -mt-1">Enforcer</span>
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4">
@@ -98,50 +96,45 @@ const AdminLayout: React.FC = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10">
-          <div className="flex items-center gap-4 flex-1">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="md:flex hidden"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            
-            <div className="relative max-w-md w-full hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input 
-                placeholder="Search anything..." 
-                className="pl-10 bg-slate-100/50 border-none focus-visible:ring-1 focus-visible:ring-primary"
-              />
-            </div>
+            <span className="text-sm text-muted-foreground">
+              {isSidebarOpen ? null : 'LETI Enforcer Portal'}
+            </span>
           </div>
 
           <div className="flex items-center gap-4">
+            <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/20 text-blue-700 border-blue-200 dark:border-blue-800">
+              Law Enforcer
+            </Badge>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
             </Button>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-700">
-                    <AvatarImage src="/avatar.png" alt="Admin" />
-                    <AvatarFallback className="bg-primary/10 text-primary">AD</AvatarFallback>
+                  <Avatar className="h-10 w-10 border border-blue-200 dark:border-blue-800">
+                    <AvatarImage src="/avatar.png" alt="Enforcer" />
+                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-blue-600">LE</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-xs leading-none text-muted-foreground">admin@letiproject.com</p>
+                    <p className="text-sm font-medium leading-none">Law Enforcer</p>
+                    <p className="text-xs leading-none text-muted-foreground">officer@leti.my</p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">Log out</DropdownMenuItem>
               </DropdownMenuContent>
@@ -158,4 +151,4 @@ const AdminLayout: React.FC = () => {
   );
 };
 
-export default AdminLayout;
+export default LawEnforcerLayout;

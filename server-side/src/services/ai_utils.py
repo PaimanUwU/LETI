@@ -4,13 +4,13 @@ import pandas as pd
 import joblib
 import numpy as np
 
-from .schemas import CrimePredictionInput
-from .district_coordinates import DISTRICT_COORDINATES
+from ..models.schemas import CrimePredictionInput
+from ..utils.district_coordinates import DISTRICT_COORDINATES
 
 # =========================================================
 # PATH CONFIG
 # =========================================================
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[3]
 DATA_PATH = BASE_DIR / "AI" / "crime_district.csv"
 MODEL_PATH = BASE_DIR / "AI" / "crime_analysis_rf.joblib"
 
@@ -26,7 +26,7 @@ def _preload_data_cache() -> pd.DataFrame:
     """
     try:
         if not DATA_PATH.exists():
-            print(f"⚠️ CSV not found: {DATA_PATH}")
+            print(f"[WARN] CSV not found: {DATA_PATH}")
             return pd.DataFrame()
 
         df = pd.read_csv(DATA_PATH)
@@ -47,11 +47,11 @@ def _preload_data_cache() -> pd.DataFrame:
         df["year"] = df["date"].dt.year
         df["month"] = df["date"].dt.month
 
-        print("✅ Dataset loaded and cached")
+        print("[OK] Dataset loaded and cached")
         return df
 
     except Exception as e:
-        print(f"❌ Dataset error: {e}")
+        print(f"[ERROR] Dataset error: {e}")
         return pd.DataFrame()
 
 
@@ -75,12 +75,12 @@ MODEL = None
 try:
     if MODEL_PATH.exists():
         MODEL = joblib.load(MODEL_PATH)
-        print("✅ ML model loaded successfully")
+        print("[OK] ML model loaded successfully")
     else:
-        print("⚠️ Model not found")
+        print("[WARN] Model not found")
 
 except Exception as e:
-    print(f"❌ Model load failed: {e}")
+    print(f"[ERROR] Model load failed: {e}")
     MODEL = None
 
 
@@ -126,55 +126,45 @@ def crime_counts_by_category(limit: int = 10) -> list[dict]:
         .to_dict("records")
     )
 
-
-def monthly_trends(district: str | None = None) -> list[dict]:
+def monthly_trends(year: int | None = None) -> list[dict]:
     """
-    @desc     Compiles chronological crime frequencies. Can be scoped to a specific area.
+    @desc     Compiles monthly crime totals for a given year (1–12).
+              Filters out aggregate rows (district="all", type="all").
+              If no year is given, uses the most recent year in the dataset.
     @header   none - note: this endpoint is intended for internal dashboard use and may not require auth.
-    @body     {str|None} district - Optional district string to filter the dataset.
-    @returns  {list[dict]} Chronological array of months mapping to crime counts.
+    @body     {int|None} year - Optional year to filter by.
+    @returns  {list[dict]} Array of {month, label, crimes} for months 1–12.
     """
+    import calendar
+
     df = load_data()
     if df.empty:
         return []
 
-    if district:
-        df = df[df["district"] == district.lower().strip()]
+    # Drop aggregate rows
+    df = df[(df["district"] != "all") & (df["type"] != "all")]
 
-    return (
-        df.groupby("month", as_index=False)["crimes"]
-        .sum()
-        .sort_values("month")
-        .to_dict("records")
-    )
+    # Ensure temporal columns exist
+    df["year"] = df["date"].dt.year
+    df["month"] = df["date"].dt.month
 
+    # Default to latest year
+    if year is None:
+        year = int(df["year"].max())
 
-def dashboard_summary(limit: int = 10) -> dict:
-    """
-    @desc     Consolidates high-level metrics required to populate the UI dashboard.
-    @header   none - note: this endpoint is intended for internal dashboard use and may not require auth.
-    @body     {int} limit - Constraint parameter passed down to sub-queries.
-    @returns  {dict} A combined dictionary holding rows, totals, and top N lists.
-    """
-    df = load_data()
+    df = df[df["year"] == year]
 
-    if df.empty:
-        return {
-            "total_rows": 0,
-            "total_crimes": 0,
-            "top_districts": [],
-            "top_categories": [],
-            "monthly_trends": []
+    # Aggregate by month
+    monthly = df.groupby("month")["crimes"].sum()
+
+    return [
+        {
+            "month": m,
+            "label": calendar.month_abbr[m],
+            "crimes": int(monthly.get(m, 0)),
         }
-
-    return {
-        "total_rows": len(df),
-        "total_crimes": float(df["crimes"].sum()),
-        "top_districts": top_districts(limit),
-        "top_categories": crime_counts_by_category(limit),
-        "monthly_trends": monthly_trends()
-    }
-
+        for m in range(1, 13)
+    ]
 
 # =========================================================
 # DASHBOARD STAT CARDS

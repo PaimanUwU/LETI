@@ -7,7 +7,18 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+venv/
+.venv/
+**/venv/
+**/.venv/
 
 # MacOS Specific
 .DS_Store
+
+# Databases 
+*.db
+*.sqlite
+*.sqlite3
+
+# Arip punya vscode settings
+.vscode/

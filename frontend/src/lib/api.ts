@@ -5,25 +5,53 @@ const BASE_URL = "http://localhost:8000";
 export interface Token {
   access_token: string;
   token_type: string;
+  role?: string;
+  is_admin?: boolean;
 }
 
 export interface UserResponse {
   id: number;
   email: string;
   is_admin: boolean;
+  role?: string;
   created_at: string;
 }
 
 export interface ReportResponse {
   id: number;
   name: string;
+  email?: string;
   phone_number: string;
+  category?: string;
   title: string;
   description: string;
   location: string;
   created_at: string;
   type?: string;
   approval_status?: string;
+}
+
+export interface ReportStats {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+export interface CaseResponse {
+  id: number;
+  title: string;
+  description?: string;
+  assigned_to?: number;
+  notes?: string;
+  report_count: number;
+  created_at: string;
+}
+
+export interface CaseStats {
+  total: number;
+  active: number;
+  empty: number;
 }
 
 export interface DashboardStats {
@@ -42,44 +70,9 @@ export interface CrimePredictionInput {
   month: number;
 }
 
-export interface HeatmapPoint {
-  latitude: number;
-  longitude: number;
-  intensity: number;
-}
-
-export interface HeatmapFilters {
-  state?: string;
-  category?: string;
-  type?: string;
-  year?: number;
-  month?: number;
-  limit?: number;
-}
-
-export interface Distribution {
-  label: string;
-  value: number;
-  color: string;
-  labelX: number;
-  labelY: number;
-  textAnchor: "start" | "end" | "middle";
-}
-
-export interface Trend {
-  month: string;
-  Theft: number;
-  Assault: number;
-  Burglary: number;
-  Robbery: number;
-}
-
 // --- Helper ---
 
-async function apiFetch<T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("token");
   const headers = {
     "Content-Type": "application/json",
@@ -94,10 +87,8 @@ async function apiFetch<T>(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const message = errorData.detail
-      ? typeof errorData.detail === "string"
-        ? errorData.detail
-        : JSON.stringify(errorData.detail)
+    const message = errorData.detail 
+      ? (typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail))
       : `API Error: ${response.status} ${response.statusText}`;
     throw new Error(message);
   }
@@ -152,25 +143,32 @@ export const api = {
     },
     getHeatmapPredictions: (params: any = {}) => {
       const query = new URLSearchParams(params).toString();
-      return apiFetch<any>(
-        `/api/ai/heatmap_predictions${query ? `?${query}` : ""}`,
-      );
+      return apiFetch<any>(`/api/ai/heatmap_predictions${query ? `?${query}` : ""}`);
     },
   },
   reports: {
-    getAll: () => apiFetch<ReportResponse[]>("/api/reports"),
-    create: (data: any) =>
-      apiFetch<ReportResponse>("/api/reports", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    getAll: (params?: { status?: string }) => {
+      const query = params?.status ? `?status=${encodeURIComponent(params.status)}` : "";
+      return apiFetch<ReportResponse[]>(`/api/reports${query}`);
+    },
+    getStats: () => apiFetch<ReportStats>("/api/reports/stats"),
+    create: (data: any) => apiFetch<ReportResponse>("/api/reports/submit", { method: "POST", body: JSON.stringify(data) }),
     update: (reportId: number, data: any) =>
-      apiFetch<ReportResponse>(`/api/reports/${reportId}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
+      apiFetch<ReportResponse>(`/api/reports/${reportId}`, { method: "PATCH", body: JSON.stringify(data) }),
+    updateStatus: (reportId: number, approvalStatus: string, caseId?: number) =>
+      apiFetch<ReportResponse>(`/api/reports/${reportId}/status`, { method: "PATCH", body: JSON.stringify({ approval_status: approvalStatus, case_id: caseId ?? null }) }),
+    delete: (reportId: number) => apiFetch<void>(`/api/reports/${reportId}`, { method: "DELETE" }),
+  },
+  cases: {
+    getAll: () => apiFetch<CaseResponse[]>("/api/cases"),
+    getStats: () => apiFetch<CaseStats>("/api/cases/stats"),
+    getOne: (id: number) => apiFetch<any>(`/api/cases/${id}`),
+    create: (data: { title: string; description?: string }) =>
+      apiFetch<CaseResponse>("/api/cases", { method: "POST", body: JSON.stringify(data) }),
+    linkReport: (caseId: number, reportId: number) =>
+      apiFetch<any>(`/api/cases/${caseId}/link/${reportId}`, { method: "POST" }),
   },
   health: {
     check: () => apiFetch<any>("/health"),
-  },
+  }
 };

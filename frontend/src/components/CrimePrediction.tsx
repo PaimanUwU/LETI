@@ -259,60 +259,11 @@ export function CrimePrediction() {
   const handlePredict = async () => {
     setLoading(true);
     setError(null);
-    setPrediction(null);
-
     try {
-      const timeframe = TIMEFRAMES[selectedTimeframe];
-
-      // Run predictions for all crime types in parallel for this district
-      const predictions = await Promise.all(
-        CRIME_TYPES.map(async (crimeType) => {
-          try {
-            const result = await api.ai.predict({
-              district: selectedDistrict,
-              category: crimeType.category,
-              type: crimeType.value,
-              year: timeframe.year,
-              month: timeframe.months,
-            });
-            return {
-              ...crimeType,
-              count: Math.max(0, Math.round(result.predicted_crimes || 0)),
-            };
-          } catch {
-            return { ...crimeType, count: 0 };
-          }
-        }),
-      );
-
-      // Sort by predicted count descending
-      const sorted = predictions
-        .filter((p) => p.count > 0)
-        .sort((a, b) => b.count - a.count);
-
-      const totalPredicted = sorted.reduce((sum, p) => sum + p.count, 0);
-      const riskLevel = getRiskLevel(totalPredicted);
-
-      // Calculate probability as a percentage (normalized)
-      const maxExpected = 200; // baseline max for normalization
-      const probability = Math.min(
-        99,
-        Math.max(5, Math.round((totalPredicted / maxExpected) * 100)),
-      );
-
-      setPrediction({
-        riskLevel,
-        probability,
-        predictedCrimes: totalPredicted,
-        topCrimeTypes: sorted.slice(0, 5).map((p, i) => ({
-          rank: i + 1,
-          label: p.label,
-          count: p.count,
-        })),
-        accuracy: 87.3,
-      });
+      const result = await api.ai.predict(input);
+      setPrediction(result);
     } catch (err: any) {
-      setError(err.message || "Prediction failed. Please try again.");
+      setError(err.message || "Prediction failed");
     } finally {
       setLoading(false);
     }
