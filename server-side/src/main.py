@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .utils.database import engine, Base
-from .routes import ai, auth, cases, dashboard, reports, users
+from .routes import ai, auth, cases, dashboard, reports, users, settings
 
 # ── Create tables ──────────────────────────────────────────
 Base.metadata.create_all(bind=engine)
@@ -33,6 +33,7 @@ app.include_router(dashboard.router)
 app.include_router(ai.router)
 app.include_router(reports.router)
 app.include_router(cases.router)
+app.include_router(settings.router)
 
 
 # ── Health check ───────────────────────────────────────────
