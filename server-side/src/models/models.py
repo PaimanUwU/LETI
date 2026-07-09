@@ -1,4 +1,4 @@
-﻿from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Boolean, DateTime, Date
+﻿from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Boolean, DateTime, Date, Time
 from sqlalchemy.sql import func
 from ..utils.database import Base
 
@@ -51,9 +51,12 @@ class Report(Base):
     name = Column(String)
     email = Column(String, index=True)
     phone_number = Column(String, index=True)
+    ic_number = Column(String, index=True)
     category = Column(String, default="property")  # "assault" | "property"
     type = Column(String)  # constrained to VALID_CRIME_TYPES
     title = Column(String)
+    incident_date = Column(Date, nullable=True)
+    incident_time = Column(Time, nullable=True)
     description = Column(String)
     location = Column(String)
     approval_status = Column(String, default="pending")  # "pending" | "approved" | "rejected"
