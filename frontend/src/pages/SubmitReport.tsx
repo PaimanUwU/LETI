@@ -233,14 +233,23 @@ export default function Submit() {
         {step === 2 && (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label
-                className="text-sm font-medium leading-none"
-                htmlFor="title"
-              >
-                Report Title
-              </label>
+              <label className="text-sm font-medium leading-none" htmlFor="ic_number">IC Number</label>
               <input
-                id="title"
+                id="ic_number"
+                required
+                value={formData.ic_number}
+                onChange={(e) => setFormData({...formData, ic_number: e.target.value})}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                placeholder="e.g. 901231-01-1234"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none" htmlFor="phone">Phone Number</label>
+              <input
+                id="phone"
                 required
                 value={formData.title}
                 onChange={(e) =>

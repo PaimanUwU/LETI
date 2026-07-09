@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, constr
-from datetime import datetime, date
+from datetime import datetime, date, time
 from typing import Optional
 
 
@@ -34,11 +34,14 @@ class Token(BaseModel):
 
 class ReportCreate(BaseModel):
     name: str
-    email: Optional[str] = ""
     phone_number: str
+    ic_number: str
+    email: str
     category: str = "property"
     type: str
     title: str
+    incident_date: date
+    incident_time: time
     description: str
     location: str
     approval_status: Optional[str] = "pending"
@@ -49,9 +52,12 @@ class ReportResponse(BaseModel):
     name: str
     email: Optional[str] = ""
     phone_number: str
+    ic_number: Optional[str] = ""
     category: Optional[str] = "property"
     type: Optional[str] = None
     title: str
+    incident_date: Optional[date] = None
+    incident_time: Optional[time] = None
     description: str
     location: str
     approval_status: Optional[str] = "pending"
@@ -66,7 +72,10 @@ class ReportUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
+    ic_number: Optional[str] = None
     title: Optional[str] = None
+    incident_date: Optional[date] = None
+    incident_time: Optional[time] = None
     description: Optional[str] = None
     location: Optional[str] = None
 

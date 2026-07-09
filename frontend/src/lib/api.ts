@@ -22,13 +22,17 @@ export interface ReportResponse {
   name: string;
   email?: string;
   phone_number: string;
+  ic_number?: string;
   category?: string;
+  type?: string;
   title: string;
+  incident_date?: string;
+  incident_time?: string;
   description: string;
   location: string;
-  created_at: string;
-  type?: string;
   approval_status?: string;
+  case_id?: number;
+  created_at: string;
 }
 
 export interface ReportStats {

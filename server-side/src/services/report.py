@@ -12,9 +12,12 @@ def create_report(db: Session, report: ReportCreate) -> Report:
         name=report.name,
         email=report.email,
         phone_number=report.phone_number,
+        ic_number=report.ic_number,
         category=report.category,
         type=report.type,
         title=report.title,
+        incident_date=report.incident_date,
+        incident_time=report.incident_time,
         description=report.description,
         location=report.location,
         approval_status="pending"

@@ -8,6 +8,7 @@ Safe to run multiple times — skips if users already exist.
 """
 import sys
 from pathlib import Path
+from datetime import date, time
 
 # Ensure src/ is importable
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
@@ -54,9 +55,12 @@ def seed():
                 name="Ahmad Faizal",
                 email="ahmad.faizal@gmail.com",
                 phone_number="012-3456789",
+                ic_number="900514-10-1234",
                 category="property",
                 type="theft_vehicle_motorcycle",
                 title="Motorcycle stolen near LRT station",
+                incident_date=date(2025, 6, 15),
+                incident_time=time(22, 0),
                 description=(
                     "My Yamaha LC135 was stolen last night around 10pm while parked "
                     "near the Taman Jaya LRT station. I have already lodged a police "
@@ -69,9 +73,12 @@ def seed():
                 name="Siti Nurhaliza",
                 email="siti.nurhaliza@yahoo.com",
                 phone_number="017-9876543",
+                ic_number="880307-08-5678",
                 category="assault",
                 type="causing_injury",
                 title="Altercation at night market",
+                incident_date=date(2025, 6, 20),
+                incident_time=time(21, 30),
                 description=(
                     "A group of youths attacked a food stall vendor at the Taman "
                     "Connaught night market. The vendor sustained minor injuries. "
@@ -84,9 +91,12 @@ def seed():
                 name="Rajesh Kumar",
                 email="rajesh.kumar@outlook.com",
                 phone_number="019-1122334",
+                ic_number="950820-14-3456",
                 category="property",
                 type="break_in",
                 title="Public park facilities damaged",
+                incident_date=date(2025, 6, 18),
+                incident_time=time(7, 15),
                 description=(
                     "Several benches and the children's playground at Taman Tasik "
                     "Titiwangsa have been vandalized with graffiti and broken "
@@ -99,9 +109,12 @@ def seed():
                 name="Mei Ling Wong",
                 email="meiling.wong@gmail.com",
                 phone_number="016-5566778",
+                ic_number="910412-07-7890",
                 category="property",
                 type="break_in",
                 title="House break-in during holiday",
+                incident_date=date(2025, 4, 10),
+                incident_time=time(14, 0),
                 description=(
                     "Our house in USJ 6 was broken into while the family was away "
                     "for the Hari Raya holidays. The back door was pried open. "
@@ -114,9 +127,12 @@ def seed():
                 name="Haris Iskandar",
                 email="haris.iskandar@proton.me",
                 phone_number="013-8899001",
+                ic_number="930701-03-1122",
                 category="property",
                 type="theft_other",
                 title="Online shopping scam via social media",
+                incident_date=date(2025, 6, 25),
+                incident_time=time(11, 45),
                 description=(
                     "I was scammed by a seller on Facebook Marketplace. Paid "
                     "RM800 via online transfer for a phone that was never "
