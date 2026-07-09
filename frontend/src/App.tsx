@@ -10,6 +10,7 @@ import InfoDocs from './pages/Info/Docs'
 import AdminLayout from './layouts/AdminLayout'
 import LawEnforcerLayout from './layouts/LawEnforcerLayout'
 import Dashboard from './pages/Admin/Dashboard'
+import Setting from './pages/Admin/Setting'
 import EnforcerDashboard from './pages/Enforcer/Dashboard'
 import { MainLayout } from './layouts/MainLayout'
 import './style.css'
@@ -33,6 +34,7 @@ function App() {
           <Route path="users" element={<Dashboard />} />
           <Route path="reports" element={<Dashboard />} />
           <Route path="ai" element={<Dashboard />} />
+          <Route path="settings" element={<Setting />} />
         </Route>
 
         {/* Law Enforcer Routes */}

@@ -1,10 +1,22 @@
+import { useMarkdown } from "@/hooks/useMarkdown";
+
 export default function InfoAI() {
+  const { html, loading } = useMarkdown("ai");
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 px-4 max-w-5xl flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto py-10 px-4">
-      <h1 className="text-4xl font-bold mb-6">The AI</h1>
-      <p className="text-lg text-muted-foreground">
-        Information about our AI prediction model.
-      </p>
+    <div className="container mx-auto py-10 px-4 max-w-5xl">
+      <div 
+        className="markdown-content"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }
